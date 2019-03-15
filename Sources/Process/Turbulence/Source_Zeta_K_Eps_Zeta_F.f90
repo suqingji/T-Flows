@@ -15,10 +15,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type)           :: grid
   type(Solver_Type), target :: sol
   integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c
@@ -50,7 +50,7 @@
     if(n_step > 500) then
       b(c) = b(c) + f22 % n(c) * grid % vol(c) * density
     else
-      b(c) = b(c) + max(0.0, f22 % n(c)*grid % vol(c)) * density
+      b(c) = b(c) + max(0.0, f22 % n(c) * grid % vol(c)) * density
       a % val(a % dia(c)) = a % val(a % dia(c))                  &
                           + max(0.0, -f22 % n(c) * grid % vol(c) &
                           / (zeta % n(c) + TINY)) * density
