@@ -270,11 +270,6 @@
         call Compute_Turbulent(flow, sol, dt, ini, kin, n)
         call Compute_Turbulent(flow, sol, dt, ini, eps, n)
 
-        if(heat_transfer) then
-          call Calculate_Heat_Flux(flow)
-          call Compute_Turbulent(flow, sol, dt, ini, t2,  n)
-        end if
-
         call Update_Boundary_Values(flow)
 
         call Compute_F22(grid, sol, ini, f22)
@@ -282,6 +277,10 @@
 
         call Calculate_Vis_T_K_Eps_Zeta_F(flow)
 
+        if(heat_transfer) then
+          call Calculate_Heat_Flux(flow)
+          call Compute_Turbulent(flow, sol, dt, ini, t2,  n)
+        end if
       end if
 
       if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
