@@ -565,10 +565,12 @@
 
     if(heat_transfer) then
 
+      call Var_Mod_Allocate_Solution('T2', '', t2, grid)
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
       allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+      allocate(p_t2    (-grid % n_bnd_cells:grid % n_cells)); p_t2     = 0.
 
     end if ! heat_transfer
 
@@ -603,6 +605,7 @@
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
+        call Var_Mod_Allocate_Statistics(t2)
 
       end if ! heat_transfer
 

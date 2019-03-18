@@ -113,7 +113,8 @@
         end if
       end if
 
-      if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+      if( (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) .or. &
+          (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) ) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.   &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.   &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.   &
@@ -236,8 +237,8 @@
           f22  % n(c2) = f22  % n(grid % bnd_cond % copy_c(c2))
         end if
 
-        if(turbulence_model .eq. K_EPS_ZETA_F .and. &
-           heat_transfer) then 
+        if( (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) .or. &
+            (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) ) then
           t2 % n(c2) = t2 % n(grid % bnd_cond % copy_c(c2))
         end if
 

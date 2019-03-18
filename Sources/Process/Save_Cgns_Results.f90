@@ -186,7 +186,8 @@
                               f22 % n(1),  "TurbulentQuantityF22")
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+  if( (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) .or. &
+      (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) ) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               t2 % n(1),  "TurbulentQuantityT2")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
