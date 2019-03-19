@@ -907,7 +907,7 @@ function processor_full_length_tests {
     "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
 
   echo "================================= TEST 8 =============================="
-  # [~12 HOURS test]
+  # [~4.5 HOURS test]
   processor_full_length_test \
     "$HYB_CHANNEL_HR_UNIFORM_DIR" \
     "hybrid_les_rans" \
