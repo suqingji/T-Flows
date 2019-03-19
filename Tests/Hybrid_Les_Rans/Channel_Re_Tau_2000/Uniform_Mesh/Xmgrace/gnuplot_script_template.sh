@@ -91,10 +91,11 @@ plot \
 
 # ----- k_plus
 unset logscale x
-set format x "$%2.1t\\\cdot10^{%L}$"
+set format x "$%2.1t\\!\\cdot\\!10^{%L}$"
 set xlabel '$y^+$' offset 0., 0.5
 set xrange [1e-1:2e3]
-set xtics offset 0,0.0 border 0,500,1500 scale 5
+set xtics offset 0,0.0 border 0,500,1900 scale 5
+set xtics add ("0" 0)
 set mxtics 5
 
 set ylabel "$k^+$" offset 0.5, 0.0
