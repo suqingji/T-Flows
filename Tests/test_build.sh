@@ -10,7 +10,7 @@ FCOMP="gnu"
 # Conduct tests with DEBUG=yes
 DEBUG="no"
 # Repeat tests with CGNS_HDF5=yes
-CGNS="yes"
+CGNS="no"
 
 # A small reminder how to set up alternatives if you have mpich and openmpi:
 #update-alternatives --install /usr/bin/mpif90 mpif90 /usr/bin/mpif90.openmpi 20
@@ -914,7 +914,7 @@ function processor_full_length_tests {
     "$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
 
   echo "================================= TEST 9 =============================="
-  # [~12 HOURS test]
+  # [~4 HOURS test]
   processor_full_length_test \
     "$HYB_CHANNEL_HR_STRETCHED_DIR" \
     "hybrid_les_rans" \
