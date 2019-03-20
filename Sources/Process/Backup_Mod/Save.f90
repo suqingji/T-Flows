@@ -163,11 +163,10 @@
     call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'l_scale',  l_scale(-nb_s:nc_s))
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+  if( (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) .or. &
+      (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) ) then
     call Backup_Mod_Write_Variable(fh, d, vc, 't2',       t2)
     call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'p_t2',     p_t2    (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
-  else if (heat_transfer .and. turbulence_model .eq. HYBRID_LES_RANS) then
     call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
   end if
 

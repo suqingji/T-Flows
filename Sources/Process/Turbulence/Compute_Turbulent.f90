@@ -212,7 +212,8 @@
     if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(flow, sol, n_step)
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+  if( (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) .or. &
+      (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) ) then
     if(phi % name .eq. 'T2')  call Source_T2(flow, sol)
   end if
 
@@ -242,7 +243,7 @@
 
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
-    if(phi % name .eq. 'ZETA')  phi % n(c) = min(phi % n(c), 1.8) 
+    if(phi % name .eq. 'ZETA')  phi % n(c) = min(phi % n(c), 1.8)
   end do
 
   ! Print info on the screen
@@ -257,7 +258,8 @@
       call Info_Mod_Iter_Fill_At(3, 3, phi % name, exec_iter, phi % res)
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+  if( (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) .or. &
+      (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) ) then
     if(phi % name .eq. 'T2')  &
       call Info_Mod_Iter_Fill_At(3, 5, phi % name, exec_iter, phi % res)
   end if

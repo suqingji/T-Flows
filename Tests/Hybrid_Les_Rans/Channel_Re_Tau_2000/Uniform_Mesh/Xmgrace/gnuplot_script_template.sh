@@ -91,10 +91,11 @@ plot \
 
 # ----- k_plus
 unset logscale x
-set format x "$%2.1t\\\cdot10^{%L}$"
+set format x "$%2.1t\\!\\cdot\\!10^{%L}$"
 set xlabel '$y^+$' offset 0., 0.5
 set xrange [1e-1:2e3]
-set xtics offset 0,0.0 border 0,500,1500 scale 5
+set xtics offset 0,0.0 border 0,500,1900 scale 5
+set xtics add ("0" 0)
 set mxtics 5
 
 set ylabel "$k^+$" offset 0.5, 0.0
@@ -103,9 +104,9 @@ set ytics offset 0,0.0 border 0,1,7 scale 5
 set mytics 2
 
 plot \
-1/0 with lp ls 1 ps 5 t '$k_{res}$', \
-'DAT_FILE_WITH_RESULTS_MACRO' usi ($1):($3) with lp ls 1 not, \
-1/0 with lp ls 2 ps 5 t '$k_{tot}$', \
+1/0 with lp ls 1 ps 5 t '$k_{tot} \: ref. \: LES$', \
+'k_plus_Re_tau_2000.dat' usi ($1):($2) with lp ls 1 not, \
+1/0 with lp ls 2 ps 5 t '$k_{tot} \: Current$', \
 'DAT_FILE_WITH_RESULTS_MACRO' usi ($1):($5) with lp ls 2 not
 
 # necessary line

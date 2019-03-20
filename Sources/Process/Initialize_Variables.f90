@@ -158,7 +158,8 @@
             i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22 %n(c)=prof(k,i)
           end if
 
-          if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+          if( (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) .or. &
+              (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) ) then
             i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
           end if
 
@@ -309,8 +310,8 @@
           y_plus(c) = 0.001
         end if
 
-        if(turbulence_model .eq. K_EPS_ZETA_F .and. &
-           heat_transfer) then
+          if( (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) .or. &
+              (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) ) then
           vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
           t2 % o(c)  = t2 % n(c)
           t2 % oo(c) = t2 % n(c)
