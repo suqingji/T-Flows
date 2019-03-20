@@ -104,10 +104,10 @@ set ytics offset 0,0.0 border 0,1,7 scale 5
 set mytics 2
 
 plot \
-1/0 with lp ls 1 ps 5 t '$k_{tot} \, Current$', \
-'DAT_FILE_WITH_RESULTS_MACRO' usi ($1):($5) with lp ls 1 not, \
-1/0 with lp ls 2 ps 5 t '$k_{tot} \, ref. LES$', \
-'k_plus_Re_tau_2000.dat' usi ($1):($2) with lp ls 2 not
+1/0 with lp ls 1 ps 5 t '$k_{tot} \: ref. \: LES$', \
+'k_plus_Re_tau_2000.dat' usi ($1):($2) with lp ls 1 not, \
+1/0 with lp ls 2 ps 5 t '$k_{tot} \: Current$', \
+'DAT_FILE_WITH_RESULTS_MACRO' usi ($1):($5) with lp ls 2 not
 
 # necessary line
 unset multiplot
