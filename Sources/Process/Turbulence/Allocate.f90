@@ -228,6 +228,13 @@
 
     if(turbulence_statistics) then
 
+      ! First moments
+      call Var_Mod_Allocate_Statistics(u)
+      call Var_Mod_Allocate_Statistics(v)
+      call Var_Mod_Allocate_Statistics(w)
+      call Var_Mod_Allocate_Statistics(p)
+
+      ! Second moments
       call Var_Mod_Allocate_Statistics(uu)
       call Var_Mod_Allocate_Statistics(vv)
       call Var_Mod_Allocate_Statistics(ww)
