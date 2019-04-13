@@ -45,7 +45,7 @@
 
       t_1(c) = kin % n(c)/eps_l(c)
       t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
-      t_3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * shear(c) + TINY)
+      t_3(c) = 0.8/(sqrt(3.0)*c_mu_d * zeta % n(c) * shear(c) + TINY)
 
       l_1(c) = kin % n(c)**1.5/eps_l(c)
       l_2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
