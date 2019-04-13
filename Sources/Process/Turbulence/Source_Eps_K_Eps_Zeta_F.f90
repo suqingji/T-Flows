@@ -27,7 +27,7 @@
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, j
   real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real                       :: e_sor, c_11e, ebf
+  real                       :: e_sor, c_11e
   real                       :: eps_wf, eps_int
   real                       :: fa, u_tau_new, kin_vis
 !==============================================================================!
@@ -115,6 +115,7 @@
 
         if(rough_walls) then 
           z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)      
+          z_o = max(grid % wall_dist(c1)/(e_log*y_plus(c1)),z_o)
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5 / & 
                       ((grid % wall_dist(c1) + z_o) * kappa)
 
@@ -135,8 +136,6 @@
           u_tau_new = sqrt(tau_wall(c1)/density)
           y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
 
-          ebf = 0.001 * y_plus(c1)**4 / (1.0 + y_plus(c1))
-
           eps_int = 2.0* kin_vis * kin % n(c1)  &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5            &
@@ -148,7 +147,6 @@
                      / (kappa*grid % wall_dist(c1) * p_kin(c1)),  &
                      1.0)
             eps % n(c1) = (1.0 - fa) * eps_int + fa * eps_wf
-
             ! Adjusting coefficient to fix eps value in near wall calls
             do j = a % row(c1), a % row(c1 + 1) - 1
               a % val(j) = 0.0
