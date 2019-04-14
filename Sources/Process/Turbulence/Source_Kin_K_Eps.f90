@@ -107,6 +107,7 @@
 
         if(rough_walls) then
           z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)      
+          z_o = max(grid % wall_dist(c1)/(e_log*y_plus(c1)),z_o)
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
           y_plus(c1) = u_tau(c1) * (grid % wall_dist(c1) + z_o) &
                      / kin_vis
@@ -116,7 +117,7 @@
 
           p_kin(c1) = density * tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))   &
                     / (kappa*(grid % wall_dist(c1) + z_o))
-          b(c1)     = b(c1) + (p_kin(c1) - p_kin(c1))   &
+          b(c1)     = b(c1) + (p_kin(c1) - vis_t(c1) * shear(c1)**2)   &
                     * grid % vol(c1)
         else
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
@@ -127,7 +128,7 @@
 
           ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
-          p_kin_wf  = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))  &
+          p_kin_wf  = tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                     / (grid % wall_dist(c1) * kappa)
 
           p_kin_int = vis_t(c1) * shear(c1)**2

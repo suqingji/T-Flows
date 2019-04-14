@@ -35,7 +35,7 @@
   integer                    :: s, c, c1, c2, j
   real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
   real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
-  real                       :: eps_wf, eps_int, ebf, y_star
+  real                       :: eps_wf, eps_int, y_star
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -116,7 +116,8 @@
         end if
  
         if(rough_walls) then 
-          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)       
+          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)     
+          z_o = max(grid % wall_dist(c1)/(e_log*y_plus(c1)),z_o)  
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5  &
                       / ((grid % wall_dist(c1) + z_o) * kappa)
 
@@ -136,7 +137,6 @@
 
           u_tau_new = sqrt(tau_wall(c1)/density)
           y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
-          ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
           eps_int = 2.0*viscosity/density * kin % n(c1)    &
                   / grid % wall_dist(c1)**2
