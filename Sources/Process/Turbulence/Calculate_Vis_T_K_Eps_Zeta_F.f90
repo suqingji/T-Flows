@@ -119,12 +119,12 @@
 
         if(rough_walls) then
           z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)      
+          z_o = max(grid % wall_dist(c1)/(e_log*y_plus(c1)),z_o) 
           y_plus(c1) = Y_Plus_Rough_Walls(u_tau(c1),             &
                                           grid % wall_dist(c1),  &
                                           kin_vis)
           u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
-          vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
-                       / log((grid % wall_dist(c1)+z_o)/z_o)  ! is this U+?
+          vis_wall(c1) = y_plus(c1) * viscosity / u_plus
         end if  
 
         if(heat_transfer) then
