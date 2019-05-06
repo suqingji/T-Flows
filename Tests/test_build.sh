@@ -545,55 +545,159 @@ function process_save_exit_now_test {
   name_in_div=$(head -n1 divide.scr)
   nproc_in_div=$(head -n2  divide.scr | tail -n1)
 
+  if [ -f "save_now" ]; then rm save_now; fi
+  if [ -f "exit_now" ]; then rm exit_now; fi
+
   # change number of timesteps to 3
   replace_line_with_first_occurence_in_file "NUMBER_OF_TIME_STEPS" \
     "NUMBER_OF_TIME_STEPS 3" control
 
-  # change backup interval to 1 ts
+  # change backup interval to 10 ts
   replace_line_with_first_occurence_in_file "BACKUP_SAVE_INTERVAL" \
-    "BACKUP_SAVE_INTERVAL 1" control
+    "BACKUP_SAVE_INTERVAL 10" control
+
+  # comment line with LOAD_BACKUP_NAME
+  n1=$(printf "%06d" 1)
+  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
+    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
 
   echo "================================= TEST 1 =============================="
   echo "np=1, MPI=no"
   clean_compile $PROC_DIR $1 no # dir CGNS_HDF5 MPI
   cd $2
 
-  echo "save_now"
+  echo "Forcing to save: save_now"
   touch save_now
 
-  if launch_process seq 1 | grep -q ""$name_in_div"-ts000001"; then
-    echo "exit_now"
+  # get current line count where search starts
+  n_start="$(echo "$(wc -l $FULL_LOG | cut -d" " -f1) + 1" | bc -l)"
+
+  # start from scratch
+  launch_process seq 1
+
+  # find if save was made in the range [n_start: n_finish]
+  if tail -n+$n_start $FULL_LOG | \
+    grep -q "# Creating file: "$name_in_div"-ts"$n1""; then
+
+    echo "save_now was successfull"
+
+    echo "Forcing to exit: exit_now"
     touch exit_now
-    launch_process seq 1 | grep -q "# Exiting !"
-    echo "save_exit_now_test was successfull"
+
+    # uncomment line with LOAD_BACKUP_NAME
+    replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
+      "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+
+    # start from ts=1
+    n_start="$(echo "$(wc -l $FULL_LOG | cut -d" " -f1) + 1" | bc -l)"
+
+    launch_process seq 1
+
+    if tail -n+$n_start $FULL_LOG | \
+      tr -s " " | \
+      grep -q "Time step : 3"; then
+
+      echo "exit_now was NOT successfull"
+    else
+      echo "exit_now was successfull"
+    fi
+  else
+    echo "save_now was NOT successfull"
   fi
 
   echo "================================= TEST 2 =============================="
   echo "np=1, MPI=yes"
+
+  # comment line with LOAD_BACKUP_NAME
+  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
+    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+
   clean_compile $PROC_DIR $1 yes # dir CGNS_HDF5 MPI
   cd $2
 
-  echo "save_now"
+  echo "Forcing to save: save_now"
   touch save_now
 
-  if launch_process par 1 | grep -q ""$name_in_div"-ts000001"; then
-    echo "exit_now"
+  # get current line count where search starts
+  n_start="$(echo "$(wc -l $FULL_LOG | cut -d" " -f1) + 1" | bc -l)"
+
+  # start from scratch
+  launch_process par 1
+
+  # find if save was made in the range [n_start: n_finish]
+  if tail -n+$n_start $FULL_LOG | \
+    grep -q "# Creating file: "$name_in_div"-ts"$n1""; then
+
+    echo "save_now was successfull"
+
+    echo "Forcing to exit: exit_now"
     touch exit_now
-    launch_process par 1 | grep -q "# Exiting !"
-    echo "save_exit_now_test was successfull"
+
+    # uncomment line with LOAD_BACKUP_NAME
+    replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
+      "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+
+    # start from ts=1
+    n_start="$(echo "$(wc -l $FULL_LOG | cut -d" " -f1) + 1" | bc -l)"
+
+    launch_process par 1
+
+    if tail -n+$n_start $FULL_LOG | \
+      tr -s " " | \
+      grep -q "Time step : 3"; then
+
+      echo "exit_now was NOT successfull"
+    else
+      echo "exit_now was successfull"
+    fi
+  else
+    echo "save_now was NOT successfull"
   fi
 
   echo "================================= TEST 3 =============================="
   echo "np=2, MPI=yes"
 
-  echo "save_now"
+  # comment line with LOAD_BACKUP_NAME
+  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
+    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+
+  echo "Forcing to save: save_now"
   touch save_now
 
-  if launch_process par $nproc_in_div | grep -q ""$name_in_div"-ts000001"; then
-    echo "exit_now"
+  # get current line count where search starts
+  n_start="$(echo "$(wc -l $FULL_LOG | cut -d" " -f1) + 1" | bc -l)"
+
+  # start from scratch
+  launch_process par $nproc_in_div
+
+  # find if save was made in the range [n_start: n_finish]
+  if tail -n+$n_start $FULL_LOG | \
+    grep -q "# Creating file: "$name_in_div"-ts"$n1""; then
+
+    echo "save_now was successfull"
+
+    echo "Forcing to exit: exit_now"
     touch exit_now
-    launch_process par $nproc_in_div | grep -q "# Exiting !"
-    echo "save_exit_now_test was successfull"
+
+    # uncomment line with LOAD_BACKUP_NAME
+    replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
+      "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+
+    # start from ts=1
+    n_start="$(echo "$(wc -l $FULL_LOG | cut -d" " -f1) + 1" | bc -l)"
+
+    launch_process par $nproc_in_div
+
+    if tail -n+$n_start $FULL_LOG | \
+      tr -s " " | \
+      grep -q "Time step : 3"; then
+
+      echo "exit_now was NOT successfull"
+    else
+      echo "exit_now was successfull"
+    fi
+  else
+    echo "save_now was NOT successfull"
   fi
 }
 #------------------------------------------------------------------------------#
