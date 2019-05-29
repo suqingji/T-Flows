@@ -17,7 +17,7 @@
 
   Roughness_Coefficient = z_o
 
-  if(z_o_function > tiny) then
+  if(z_o_function > -tiny) then
     Roughness_Coefficient = z_o_function
   end if
 
