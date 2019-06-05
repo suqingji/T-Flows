@@ -194,7 +194,7 @@
           t % q(c2) = abs(con_wall(c1)*(t % n(c1) &
                       - t % n(c2))/grid % wall_dist(c1))
 
-          g_buoy_wall = buoy_beta(c)*abs(grav_z)*sqrt(t % q(c2)*       &
+          g_buoy_wall = buoy_beta(c1)*abs(grav_z)*sqrt(t % q(c2)*       &
                         c_mu_theta5*sqrt(abs(t2 % n(c1) * kin % n(c1))))
           
           ! Clean up b(c) from old values of g_buoy         
