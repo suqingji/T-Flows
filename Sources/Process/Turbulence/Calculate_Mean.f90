@@ -71,8 +71,19 @@
         w % mean(c) = (w % mean(c) * (1.*n) + w % n(c)) / (1.*(n+1))
         p % mean(c) = (p % mean(c) * (1.*n) + p % n(c)) / (1.*(n+1))
 
+        uu % mean(c) = (uu % mean(c)*(1.*n) + u % n(c) * u % n(c)) / (1.*(n+1))
+        vv % mean(c) = (vv % mean(c)*(1.*n) + v % n(c) * v % n(c)) / (1.*(n+1))
+        ww % mean(c) = (ww % mean(c)*(1.*n) + w % n(c) * w % n(c)) / (1.*(n+1))
+        uv % mean(c) = (uv % mean(c)*(1.*n) + u % n(c) * v % n(c)) / (1.*(n+1))
+        uw % mean(c) = (uw % mean(c)*(1.*n) + u % n(c) * w % n(c)) / (1.*(n+1))
+        vw % mean(c) = (vw % mean(c)*(1.*n) + v % n(c) * w % n(c)) / (1.*(n+1))
+
         kin % mean(c) = (kin % mean(c) * (1.*n) + kin % n(c)) / (1.*(n+1))
         eps % mean(c) = (eps % mean(c) * (1.*n) + eps % n(c)) / (1.*(n+1))
+
+        if (heat_transfer) then
+          t2 % mean(c) = (t2 % mean(c) * (1.*n) + t2 % n(c)) / (1.*(n+1))
+        end if
       end if
 
       !------------------!
@@ -85,6 +96,13 @@
         w % mean(c) = (w % mean(c) * (1.*n) + w % n(c)) / (1.*(n+1))
         p % mean(c) = (p % mean(c) * (1.*n) + p % n(c)) / (1.*(n+1))
 
+        uu % mean(c) = (uu % mean(c)*(1.*n) + u % n(c) * u % n(c)) / (1.*(n+1))
+        vv % mean(c) = (vv % mean(c)*(1.*n) + v % n(c) * v % n(c)) / (1.*(n+1))
+        ww % mean(c) = (ww % mean(c)*(1.*n) + w % n(c) * w % n(c)) / (1.*(n+1))
+        uv % mean(c) = (uv % mean(c)*(1.*n) + u % n(c) * v % n(c)) / (1.*(n+1))
+        uw % mean(c) = (uw % mean(c)*(1.*n) + u % n(c) * w % n(c)) / (1.*(n+1))
+        vw % mean(c) = (vw % mean(c)*(1.*n) + v % n(c) * w % n(c)) / (1.*(n+1))
+       
         kin  % mean(c) = (kin  % mean(c) * (1.*n) + kin  % n(c)) / (1.*(n+1))
         eps  % mean(c) = (eps  % mean(c) * (1.*n) + eps  % n(c)) / (1.*(n+1))
         zeta % mean(c) = (zeta % mean(c) * (1.*n) + zeta % n(c)) / (1.*(n+1))
