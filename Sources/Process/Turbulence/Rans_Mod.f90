@@ -25,6 +25,9 @@
   real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
   real :: g1, g1_star, g2, g3, g3_star, g4, g5, c_theta
 
+  ! Constants for the energy model:
+  real :: c_mu_theta, c_mu_theta5, kappa_theta
+
   ! Constants for the Spalart-Allmaras model:
   real :: c_b1, c_b2, c_w1, c_w2, c_w3, c_v1
 
