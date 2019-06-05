@@ -57,6 +57,15 @@
          * (zeta % n(c) - TWO_THIRDS)             &
          / (t_scale(c) + TINY)                    &
          + 0.0085 * (p_kin(c)/density) / (kin % n(c) + TINY)
+
+   if(buoyancy) then
+     f22hg = (1.0 - c_f1 - 0.65 * g_buoy(c)/density  &
+           / (eps  % n(c) + TINY))                  &
+           * (zeta % n(c) - TWO_THIRDS)             &
+           / (t_scale(c) + TINY)                    &
+           + 0.0085 * (g_buoy(c)/density) / (kin % n(c) + TINY)
+   end if
+
    b(c) = b(c) + f22hg * grid % vol(c) / (l_scale(c)**2 + TINY)
  end do
 
@@ -80,7 +89,7 @@
       ! Fill in a source coefficients
 
       ! Linearization of the near wall terms helps to get more  
-       ! stable solution, especially for small wall distance.
+      ! stable solution, especially for small wall distance.
        b(c1) = b(c1) + a % fc(s) * f22 % n(c2)
      end if   ! end if of BC=wall
    end if    ! end if of c2<0
