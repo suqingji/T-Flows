@@ -168,6 +168,10 @@
     call Backup_Mod_Write_Variable(fh, d, vc, 't2',       t2)
     call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'p_t2',     p_t2    (-nb_s:nc_s))
     call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
+    if(turbulence_statistics .and.  &
+       time_step > time_step_stat) then
+      call Backup_Mod_Write_Variable_Mean(fh, d, vc, 't2_mean', t2)
+    end if
   end if
 
 
