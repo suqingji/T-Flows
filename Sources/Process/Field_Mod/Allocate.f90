@@ -43,9 +43,9 @@
   !--------------------------------------!
   allocate(flow % scalar(flow % n_scalars))
 
-  !-------------------------------------!
-  !   Browse through all user scalars   !
-  !-------------------------------------!
+  !--------------------------------!
+  !   Browse through all scalars   !
+  !--------------------------------!
   do sc = 1, flow % n_scalars
 
     ! Set variable name

@@ -16,7 +16,8 @@
   type(Field_Type), target :: flow
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, t, p
+  type(Var_Type),  pointer :: u, v, w, t, p, phi
+  integer                  :: sc
 !==============================================================================!
 
   ! Take aliases
@@ -629,5 +630,15 @@
     end if ! buoyancy
 
   end if ! HYBRID_LES_RANS
+
+  !--------------------------------------------------!
+  !   Scalars are independ of the turbulence model   !
+  !--------------------------------------------------!
+  if(turbulence_statistics) then
+    do sc = 1, flow % n_scalars
+      phi => flow % scalar(sc)
+      call Var_Mod_Allocate_Statistics(phi)
+    end do
+  end if
 
   end subroutine

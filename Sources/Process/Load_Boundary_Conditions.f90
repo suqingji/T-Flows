@@ -79,6 +79,7 @@
                                           grid % bnd_cond % name(n),  &
                                           found,                      &
                                           .false.)
+PRINT *, 'grid % bnd_cond % name(n)', grid % bnd_cond % name(n)
     if(found) then
 1     continue
 
@@ -115,6 +116,9 @@
 
 2 continue
 
+  end do
+  do n = 1, grid % n_bnd_cond
+    PRINT *, 'types_per_color(n)', types_per_color(n)
   end do
 
   !------------------------------------------------!
