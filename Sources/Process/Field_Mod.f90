@@ -63,6 +63,9 @@
   ! Gravity
   real :: grav_x, grav_y, grav_z
 
+  ! Thermal expansion coefficient 
+  real :: beta_tec
+
   contains
 
   include 'Field_Mod/Allocate.f90'
