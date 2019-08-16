@@ -20,6 +20,7 @@
   use Grid_Mod,   only: Grid_Type
   use Solver_Mod, only: Solver_Type
   use Matrix_Mod, only: Matrix_Type
+  use Field_Mod,  only: Field_Type, beta_tec
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -29,6 +30,7 @@
   real :: Y_Plus_Low_Re
   real :: Y_Plus_Rough_Walls
   real :: Roughness_Coefficient
+  real :: Thermal_Expansion_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: t, u, v, w
@@ -94,10 +96,9 @@
                           / (kin % n(c) + TINY) * grid % vol(c)
 
       if(buoyancy) then
-        buoy_beta(c) = 1.0
-        g_buoy(c) = -buoy_beta(c) * (grav_x * ut % n(c) +  &
-                                     grav_y * vt % n(c) +  &
-                                     grav_z * wt % n(c)) * density
+        g_buoy(c) = -beta_tec * (grav_x * ut % n(c) +  &
+                                 grav_y * vt % n(c) +  &
+                                 grav_z * wt % n(c)) * density
 
         g_buoy(c) = max(g_buoy(c) ,0.0)
 
@@ -169,6 +170,7 @@
 
         ! Implementation of wall function for buoyancy-driven flows
         if(buoyancy) then
+          
           nx = grid % sx(s) / grid % s(s)
           ny = grid % sy(s) / grid % s(s)
           nz = grid % sz(s) / grid % s(s)
@@ -191,12 +193,12 @@
                      + wt_log_law * exp(-1.0 / EBF)
 
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) &
-          t % q(c2) = abs(con_wall(c1)*(t % n(c1) &
-                      - t % n(c2))/grid % wall_dist(c1))
+          t % q(c2) = con_wall(c1)*(t % n(c1) &
+                      - t % n(c2))/grid % wall_dist(c1)
 
-          g_buoy_wall = buoy_beta(c1)*abs(grav_z)*sqrt(t % q(c2)*       &
+          g_buoy_wall = beta_tec*abs(grav_z)*sqrt(abs(t % q(c2))*       &
                         c_mu_theta5*sqrt(abs(t2 % n(c1) * kin % n(c1))))
-          
+         
           ! Clean up b(c) from old values of g_buoy         
           b(c1)      = b(c1) - g_buoy(c1) * grid % vol(c1)
 
