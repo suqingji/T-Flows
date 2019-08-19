@@ -32,8 +32,9 @@
   character(len=*)         :: name_save
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
-  integer                  :: c, n, offset
-  character(len=80)        :: name_out_8, name_out_9, store_name
+  type(Var_Type),  pointer :: phi
+  integer                  :: c, n, offset, sc
+  character(len=80)        :: name_out_8, name_out_9, store_name, name_mean
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TETRA      = 10  ! cell shapes in VTK format
   integer, parameter :: VTK_HEXAHEDRON = 12
@@ -233,6 +234,14 @@
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "Temperature", flow % t % n(1))
   end if
 
+  !------------------!
+  !   Save scalars   !
+  !------------------!
+  do sc = 1, flow % n_scalars
+    phi => flow % scalar(sc)
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, phi % name, phi % n(1))
+  end do
+
   !--------------------------!
   !   Turbulent quantities   !
   !--------------------------!
@@ -297,12 +306,7 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
-     turbulence_model .eq. LES_DYNAMIC     .or.  &
-     turbulence_model .eq. LES_WALE        .or.  &
-     turbulence_model .eq. DNS             .or.  &
-     turbulence_model .eq. DES_SPALART     .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turbulence_statistics) then
     call Save_Vtu_Vector(grid, IN_4, IN_5, "MeanVelocity",  &
                                            flow % u % mean(1),  &
                                            flow % v % mean(1),  &
@@ -321,6 +325,7 @@
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_mean(1))
+
     if(heat_transfer) then
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureMean",  &
                                              flow % t % mean(1))
@@ -335,6 +340,15 @@
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX", ut_mean(1))
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY", vt_mean(1))
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ", wt_mean(1))
+    end if
+
+    if(flow % n_scalars > 0) then
+      do sc = 1, flow % n_scalars
+        phi => flow % scalar(sc)
+        name_mean = 'Mean'
+        name_mean(5:8) = phi % name
+        call Save_Vtu_Scalar(grid, IN_4, IN_5, name_mean, phi % mean(1))
+      end do
     end if
   end if
 

@@ -55,7 +55,11 @@
     include 'Control_Mod/Physics/Heat_Capacity.f90'
     include 'Control_Mod/Physics/Mass_Density.f90'
     include 'Control_Mod/Physics/Thermal_Conductivity.f90'
+<<<<<<< HEAD
     include 'Control_Mod/Physics/Thermal_Expansion_Coefficient.f90'
+=======
+    include 'Control_Mod/Physics/Species_Diffusivity.f90'
+>>>>>>> f1d9682d818b16c7eaf3998e4932fc283d2d2a4a
 
     ! Heat transfer
     include 'Control_Mod/Physics/Heat_Transfer.f90'

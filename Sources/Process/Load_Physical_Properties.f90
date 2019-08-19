@@ -18,7 +18,11 @@
   call Control_Mod_Heat_Capacity        (capacity)
   call Control_Mod_Mass_Density         (density)
   call Control_Mod_Thermal_Conductivity (conductivity)
+<<<<<<< HEAD
   call Control_Mod_Thermal_Expansion_Coefficient (beta_tec)
+=======
+  call Control_Mod_Species_Diffusivity  (diffusivity)
+>>>>>>> f1d9682d818b16c7eaf3998e4932fc283d2d2a4a
   call Control_Mod_Roughness_Coefficient(z_o)
 
   end subroutine
