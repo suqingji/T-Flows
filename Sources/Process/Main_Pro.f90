@@ -88,14 +88,14 @@
   ! Read physical models from control file
   call Read_Control_Physical(flow, backup)
 
-  ! Read numerical models from control file
-  call Read_Control_Numerical(flow)
-
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
   call Grad_Mod_Allocate(grid)
   call Turbulence_Allocate(flow)
   call User_Mod_Allocate(grid)
+
+  ! Read numerical models from control file (should be after memory allocation)
+  call Read_Control_Numerical(flow)
 
   call Grid_Mod_Calculate_Face_Geometry(grid)
 
