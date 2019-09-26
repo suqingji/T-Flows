@@ -141,10 +141,15 @@
                   / (grid % wall_dist(c1) * kappa)
 
           if(y_plus(c1) > 3) then
-
-            fa = min(density * u_tau_new**3                       &
-                     / (kappa*grid % wall_dist(c1) * p_kin(c1)),  &
-                     1.0)
+            if(buoyancy) then
+              fa = min(density * u_tau_new**3                       &
+                       / (kappa*grid % wall_dist(c1) * (p_kin(c1)+g_buoy(c))),  &
+                       1.0)
+            else
+              fa = min(density * u_tau_new**3                       &
+                       / (kappa*grid % wall_dist(c1) * p_kin(c1)),  &
+                       1.0)
+            end if        
             eps % n(c1) = (1.0 - fa) * eps_int + fa * eps_wf
             ! Adjusting coefficient to fix eps value in near wall calls
             do j = a % row(c1), a % row(c1 + 1) - 1

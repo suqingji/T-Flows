@@ -20,6 +20,7 @@
   use Grid_Mod,   only: Grid_Type
   use Solver_Mod, only: Solver_Type
   use Matrix_Mod, only: Matrix_Type
+  use Field_Mod,  only: Field_Type, beta_tec
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -29,15 +30,18 @@
   real :: Y_Plus_Low_Re
   real :: Y_Plus_Rough_Walls
   real :: Roughness_Coefficient
+  real :: Thermal_Expansion_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
-  type(Var_Type),    pointer :: u, v, w
+  type(Var_Type),    pointer :: t, u, v, w
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
   real                       :: lf, ebf, p_kin_int, p_kin_wf
   real                       :: alpha1, l_rans, l_sgs, kin_vis
+  real                       :: ut_log_law, vt_log_law, wt_log_law
+  real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -57,6 +61,7 @@
   u    => flow % u
   v    => flow % v
   w    => flow % w
+  t    => flow % t
   a    => sol % a
   b    => sol % b % val
 
@@ -91,13 +96,13 @@
                           / (kin % n(c) + TINY) * grid % vol(c)
 
       if(buoyancy) then
-        buoy_beta(c) = 1.0
-        g_buoy(c) = -buoy_beta(c) * (grav_x * ut % n(c) +  &
-                                     grav_y * vt % n(c) +  &
-                                     grav_z * wt % n(c)) * density
-        b(c) = b(c) + max(0.0, g_buoy(c) * grid % vol(c))
-        a % val(a % dia(c)) = a % val(a % dia(c))  &
-                  + max(0.0,-g_buoy(c) * grid % vol(c) / (kin % n(c) + TINY))
+        g_buoy(c) = -beta_tec * (grav_x * ut % n(c) +  &
+                                 grav_y * vt % n(c) +  &
+                                 grav_z * wt % n(c)) * density
+
+        g_buoy(c) = max(g_buoy(c) ,0.0)
+
+        b(c) = b(c) + g_buoy(c) * grid % vol(c)
       end if
     end do
   end if
@@ -162,8 +167,50 @@
                     * exp(-1.0 / ebf)
           b(c1)     = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1)
         end if! rough_walls
-      end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
-    end if    ! c2 < 0
+
+        ! Implementation of wall function for buoyancy-driven flows
+        if(buoyancy) then
+          
+          nx = grid % sx(s) / grid % s(s)
+          ny = grid % sy(s) / grid % s(s)
+          nz = grid % sz(s) / grid % s(s)
+          qx = t % q(c2) * nx
+          qy = t % q(c2) * ny
+          qz = t % q(c2) * nz
+
+          ut_log_law = - con_wall(c1) &
+                     * (t % n(c2) - t % n(c1))/grid % wall_dist(c1) * nx
+          vt_log_law = - con_wall(c1) &
+                     * (t % n(c2) - t % n(c1))/grid % wall_dist(c1) * ny
+          wt_log_law = - con_wall(c1) &
+                     * (t % n(c2) - t % n(c1))/grid % wall_dist(c1) * nz
+
+          ut % n(c1) = ut %n(c1)  * exp(-1.0 * EBF) &
+                     + ut_log_law * exp(-1.0 / EBF)
+          vt % n(c1) = vt %n(c1)  * exp(-1.0 * EBF) &
+                     + vt_log_law * exp(-1.0 / EBF)
+          wt % n(c1) = wt %n(c1)  * exp(-1.0 * EBF) &
+                     + wt_log_law * exp(-1.0 / EBF)
+
+          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) &
+          t % q(c2) = con_wall(c1)*(t % n(c1) &
+                      - t % n(c2))/grid % wall_dist(c1)
+
+          g_buoy_wall = beta_tec*abs(grav_z)*sqrt(abs(t % q(c2))*       &
+                        c_mu_theta5*sqrt(abs(t2 % n(c1) * kin % n(c1))))
+         
+          ! Clean up b(c) from old values of g_buoy         
+          b(c1)      = b(c1) - g_buoy(c1) * grid % vol(c1)
+
+          g_buoy(c1) = g_buoy(c1) * exp(-1.0 * EBF) &
+                     + g_buoy_wall * exp(-1.0 / EBF)
+
+          ! Add new values of g_buoy based on wall function approach          
+          b(c1)      = b(c1) + g_buoy(c1) * grid % vol(c1)
+        end if ! buoyancy
+
+      end if   ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
+    end if     ! c2 < 0
   end do
 
   end subroutine

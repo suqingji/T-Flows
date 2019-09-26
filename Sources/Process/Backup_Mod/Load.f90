@@ -190,6 +190,10 @@
     call Backup_Mod_Read_Variable(fh, d, vc, 't2',       t2)
     call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'p_t2',     p_t2    (-nb_s:nc_s))
     call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
+    if(turbulence_statistics .and.  &
+       time_step > time_step_stat) then
+      call Backup_Mod_Read_Variable_Mean(fh, d, vc, 't2_mean', t2)
+    end if
   end if
 
   !----------------------------!
@@ -242,7 +246,7 @@
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'u_mean', fld % u)
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'v_mean', fld % v)
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'w_mean', fld % w)
-
+    
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'uu_mean', uu)
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'vv_mean', vv)
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'ww_mean', ww)

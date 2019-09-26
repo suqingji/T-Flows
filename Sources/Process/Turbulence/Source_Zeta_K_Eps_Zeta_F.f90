@@ -58,6 +58,11 @@
     a % val(a % dia(c)) =  a % val(a % dia(c))      &
                         + grid % vol(c) * p_kin(c)  &
                         / (kin % n(c) + TINY) 
+
+    if(buoyancy)  &
+    a % val(a % dia(c)) =  a % val(a % dia(c))      &   
+                        + grid % vol(c) * g_buoy(c)  &
+                        / (kin % n(c) + TINY)            
   end do
 
   end subroutine
