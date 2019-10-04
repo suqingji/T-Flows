@@ -142,7 +142,7 @@
         tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
                      / log(e_log*max(y_plus(c1),1.05))
 
-        ebf = max(0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1)),tiny)
+        ebf = max(0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1)), TINY)
 
         p_kin_wf  = tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                     / (grid % wall_dist(c1) * kappa)
@@ -164,7 +164,7 @@
                       / (kappa*(grid % wall_dist(c1)+z_o))
         end if ! rough_walls
 
-        b(c1)     = b(c1) + (p_kin(c1) - vis_t(c1) * shear(c1)**2) * grid % vol(c1)
+        b(c1) = b(c1) + (p_kin(c1) - vis_t(c1) * shear(c1)**2) * grid % vol(c1)
 
         ! Implementation of wall function for buoyancy-driven flows
         if(buoyancy) then
@@ -183,16 +183,16 @@
           wt_log_law = - con_wall(c1) &
                      * (t % n(c2) - t % n(c1))/grid % wall_dist(c1) * nz
 
-          ut % n(c1) = ut %n(c1)  * exp(-1.0 * EBF) &
-                     + ut_log_law * exp(-1.0 / EBF)
-          vt % n(c1) = vt %n(c1)  * exp(-1.0 * EBF) &
-                     + vt_log_law * exp(-1.0 / EBF)
-          wt % n(c1) = wt %n(c1)  * exp(-1.0 * EBF) &
-                     + wt_log_law * exp(-1.0 / EBF)
+          ut % n(c1) = ut %n(c1)  * exp(-1.0 * ebf) &
+                     + ut_log_law * exp(-1.0 / ebf)
+          vt % n(c1) = vt %n(c1)  * exp(-1.0 * ebf) &
+                     + vt_log_law * exp(-1.0 / ebf)
+          wt % n(c1) = wt %n(c1)  * exp(-1.0 * ebf) &
+                     + wt_log_law * exp(-1.0 / ebf)
 
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) &
           t % q(c2) = con_wall(c1)*(t % n(c1) &
-                      - t % n(c2))/grid % wall_dist(c1)
+                      - t % n(c2)) / grid % wall_dist(c1)
 
           g_buoy_wall = beta_tec*abs(grav_z)*sqrt(abs(t % q(c2))*       &
                         c_mu_theta5*sqrt(abs(t2 % n(c1) * kin % n(c1))))
@@ -200,8 +200,8 @@
           ! Clean up b(c) from old values of g_buoy         
           b(c1)      = b(c1) - g_buoy(c1) * grid % vol(c1)
 
-          g_buoy(c1) = g_buoy(c1) * exp(-1.0 * EBF) &
-                     + g_buoy_wall * exp(-1.0 / EBF)
+          g_buoy(c1) = g_buoy(c1) * exp(-1.0 * ebf) &
+                     + g_buoy_wall * exp(-1.0 / ebf)
 
           ! Add new values of g_buoy based on wall function approach          
           b(c1)      = b(c1) + g_buoy(c1) * grid % vol(c1)
