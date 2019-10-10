@@ -21,8 +21,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
-  character(len=80)        :: name_out, store_name
-  integer                  :: fh, d, vc
+  type(Var_Type),  pointer :: phi
+  character(len=80)        :: name_out, store_name, name_mean
+  integer                  :: fh, d, vc, sc
 !==============================================================================!
 
   ! Take aliases
@@ -206,6 +207,14 @@
     end if
   end if
 
+  !------------------!
+  !   Save scalars   !
+  !------------------!
+  do sc = 1, fld % n_scalars
+    phi => fld % scalar(sc)
+    call Backup_Mod_Write_Variable(fh, d, vc, phi % name, phi)
+  end do
+
   !-----------------------------------------!
   !                                         !
   !   Turbulent statistics for all models   !
@@ -232,13 +241,14 @@
       call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'vt_mean', vt)
       call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'wt_mean', wt)
     end if
-  end if
 
-  !------------------------------!
-  !                              !
-  !   User scalars are missing   !
-  !                              !
-  !------------------------------!
+    do sc = 1, fld % n_scalars
+      phi => fld % scalar(sc)
+      name_mean = phi % name
+      name_mean(5:9) = '_mean'
+      call Backup_Mod_Write_Variable_Mean(fh, d, vc, name_mean, phi)
+    end do
+  end if
 
   ! Variable count (store +1 to count its own self)
   call Backup_Mod_Write_Int(fh, d, vc, 'variable_count', vc + 1)

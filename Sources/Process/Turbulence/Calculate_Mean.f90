@@ -17,8 +17,8 @@
   integer                  :: n0, n1
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, p, t
-  integer                  :: c, n
+  type(Var_Type),  pointer :: u, v, w, p, t, phi
+  integer                  :: c, n, sc
 !==============================================================================!
 
   ! Take aliases
@@ -150,10 +150,15 @@
         wt % mean(c) = (wt % mean(c)*(1.*n) + w % n(c) * t % n(c) ) / (1.*(n+1))
       end if
 
-      !------------------------------!
-      !   User scalars are missing   !
-      !------------------------------!
-    end do 
+      !-------------!
+      !   Scalars   !
+      !-------------!
+      do sc = 1, flow % n_scalars
+        phi => flow % scalar(sc)
+        phi % mean(c) = (phi % mean(c) * (1.*n) + phi % n(c)) / (1.*(n+1))
+      end do
+
+    end do
   end if
 
   end subroutine
