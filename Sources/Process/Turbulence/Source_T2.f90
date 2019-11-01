@@ -90,22 +90,24 @@
 
         EBF  = 0.01*y_plus(c1)**4.0/(1.0+5.0*y_plus(c1))
 
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) & 
         t % q(c2) = abs(con_wall(c1)*(t % n(c1) &
                     - t % n(c2))/grid % wall_dist(c1))
 
         p_t2_wall  = t % q(c2)*c_mu_theta5*sqrt(abs(t2 % n(c1))) &
                      /(kappa_theta*c_mu25*grid % wall_dist(c1))
 
-        b(c1) = b(c1) - 2.0 * p_t2(c1) * grid % vol(c1)
+        b(c1) = b(c1) - p_t2(c1) * grid % vol(c1)
 
         if(y_plus(c1) > 11.0) then
-          b(c1) = b(c1) + 2.0*p_t2_wall * grid % vol(c1)
+          b(c1) = b(c1) + p_t2_wall * grid % vol(c1)
         else  
-          b(c1) = b(c1) + 2.0*(p_t2(c1) * exp(-1.0 * EBF) + &
+          b(c1) = b(c1) + (p_t2(c1) * exp(-1.0 * EBF) + &
                   p_t2_wall * exp(-1.0/EBF)) * grid % vol(c1)
         end if
 
         t2 % n(c2) = 0.0
+         
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
