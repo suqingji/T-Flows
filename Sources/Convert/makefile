@@ -20,9 +20,6 @@ CGNS_HDF5 = no
 # Multi-threaded Calculate_Wall_Distance.f90 (env. var to use: OMP_NUM_THREADS)
 OPENMP = no
 
-# Multi-threaded Calculate_Wall_Distance.f90 (env. var to use: OMP_NUM_THREADS)
-OPENMP = no
-
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
 DIR_SHARED = ../Shared
