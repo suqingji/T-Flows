@@ -276,11 +276,11 @@
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                 tt_mean(1),"TemperatureFluctuations")
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                ut_mean(1),"TurbulentHeatFluxX")
+                                ut_mean(1),"TurbulentHeatFluxResolvedX")
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                vt_mean(1),"TurbulentHeatFluxY")
+                                vt_mean(1),"TurbulentHeatFluxResolvedY")
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                wt_mean(1),"TurbulentHeatFluxZ")
+                                wt_mean(1),"TurbulentHeatFluxResolvedZ")
     end if
   end if
 
