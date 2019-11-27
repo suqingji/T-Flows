@@ -337,9 +337,9 @@
       end do
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureFluctuations",  &
                                  tt_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbHeatFluxX_resolved", ut_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbHeatFluxY_resolved", vt_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbHeatFluxZ_resolved", wt_mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxResolvedX", ut_mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxResolvedY", vt_mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxResolvedZ", wt_mean(1))
     end if
 
     if(flow % n_scalars > 0) then
