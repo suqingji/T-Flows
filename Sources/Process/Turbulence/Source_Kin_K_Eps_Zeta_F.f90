@@ -149,8 +149,7 @@
 
         p_kin_int = vis_t(c1) * shear(c1)**2
 
-        p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
-                    * exp(-1.0 / ebf)
+        p_kin(c1) = p_kin_wf
 
         if(rough_walls) then
           z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)    
