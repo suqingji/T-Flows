@@ -22,14 +22,14 @@
   real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
-  type(Var_Type),    pointer :: u, v, w
+  type(Var_Type),    pointer :: u, v, w, t
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, j
   real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
   real                       :: e_sor, c_11e
-  real                       :: eps_wf, eps_int
-  real                       :: fa, u_tau_new, kin_vis
+  real                       :: eps_wf, eps_int, p_kin_int, p_kin_wf, ebf
+  real                       :: fa, u_tau_new, kin_vis, g_buoy_wall
 !==============================================================================!
 !   In dissipation of turbulent kinetic energy equation exist two              !
 !   source terms which have form:                                              !
@@ -60,6 +60,7 @@
   u    => flow % u
   v    => flow % v
   w    => flow % w
+  t    => flow % t
   a    => sol % a
   b    => sol % b % val
 
@@ -133,24 +134,42 @@
                        / log(e_log * max(y_plus(c1), 1.05))
 
           u_tau_new = sqrt(tau_wall(c1)/density)
+
           y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
 
           eps_int = 2.0* kin_vis * kin % n(c1)  &
                   / grid % wall_dist(c1)**2
+
           eps_wf  = c_mu75 * kin % n(c1)**1.5            &
                   / (grid % wall_dist(c1) * kappa)
 
+          ebf = max(0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1)), TINY)
+
+          p_kin_wf  = tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
+                      / (grid % wall_dist(c1) * kappa)
+ 
+          p_kin_int = vis_t(c1) * shear(c1)**2
+ 
+          p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
+                      * exp(-1.0 / ebf)
+
+          fa = min(p_kin_wf * exp(-1.0 / ebf)/p_kin(c1) , 1.0) 
+
+          if(buoyancy) then
+            g_buoy_wall = beta_tec*abs(grav_x + grav_y + grav_z)  &
+                         * sqrt(abs(t % q(c2))                    &
+                         * c_mu_theta5                            &
+                         * sqrt(abs(t2 % n(c1) * kin % n(c1))))
+
+            fa = min((p_kin_wf + g_buoy_wall) * exp(-1.0 / ebf)     &
+                 /(p_kin(c1) + g_buoy(c1)) , 1.0) 
+
+          end if        
+
           if(y_plus(c1) > 3) then
-            if(buoyancy) then
-              fa = min(density * u_tau_new**3                       &
-                       / (kappa*grid % wall_dist(c1) * (p_kin(c1)+g_buoy(c))),  &
-                       1.0)
-            else
-              fa = min(density * u_tau_new**3                       &
-                       / (kappa*grid % wall_dist(c1) * p_kin(c1)),  &
-                       1.0)
-            end if        
-            eps % n(c1) = (1.0 - fa) * eps_int + fa * eps_wf
+
+            eps % n(c1) = sqrt(1.0 - fa) * eps_int + sqrt(fa) * eps_wf
+
             ! Adjusting coefficient to fix eps value in near wall calls
             do j = a % row(c1), a % row(c1 + 1) - 1
               a % val(j) = 0.0
