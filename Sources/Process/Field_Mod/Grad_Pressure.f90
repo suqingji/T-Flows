@@ -34,9 +34,12 @@
   end do
 
   ! Compute individual gradients without refreshing buffers
-  call Field_Mod_Grad_Component_No_Refresh(flow, p % n, 1, p % x)  ! dp/dx
-  call Field_Mod_Grad_Component_No_Refresh(flow, p % n, 2, p % y)  ! dp/dy
-  call Field_Mod_Grad_Component_No_Refresh(flow, p % n, 3, p % z)  ! dp/dz
+  call Field_Mod_Grad_Component_No_Refresh(flow, p % n, 1, p % x,   &
+                                           impose_symmetry = .false.)  ! dp/dx
+  call Field_Mod_Grad_Component_No_Refresh(flow, p % n, 2, p % y,   &
+                                           impose_symmetry = .false.)  ! dp/dy
+  call Field_Mod_Grad_Component_No_Refresh(flow, p % n, 3, p % z,   &
+                                           impose_symmetry = .false.)  ! dp/dz
 
   ! Refresh buffers for gradient components
   call Grid_Mod_Exchange_Cells_Real(grid, p % x)
