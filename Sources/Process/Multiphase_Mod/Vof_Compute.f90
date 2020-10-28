@@ -21,7 +21,7 @@
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, fu
+  integer                    :: s, c, c1, c2, fu, nb, nc
   integer                    :: donor, accept, corr_num
   integer                    :: i_sub, n_sub, wrong_vf, n_wrong_vf0, n_wrong_vf1
   integer,           pointer :: n_sub_param, corr_num_max
@@ -44,6 +44,9 @@
   corr_num_max      => mult % corr_num_max
   a => sol % a
   b => sol % b % val
+
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
 
   epsloc = epsilon(epsloc)
 
@@ -126,7 +129,11 @@
       vof % o(:) = vof % n(:)
 
       ! Compute Gradient:
-      call Field_Mod_Grad_Variable(flow, vof)
+      !call Field_Mod_Grad_Variable(flow, vof)
+      call Multiphase_Mod_Vof_Gradient_Iterative(mult, vof % n(-nb:nc),   &
+                                                       vof % x(-nb:nc),   &
+                                                       vof % y(-nb:nc),   &
+                                                       vof % z(-nb:nc))
 
       call Multiphase_Mod_Vof_Predict_Beta(mult, grid, beta_f, beta_c, c_d)
 
@@ -255,7 +262,11 @@
 
   end if
 
-  call Field_Mod_Grad_Variable(flow, vof)
+  !call Field_Mod_Grad_Variable(flow, vof)
+  call Multiphase_Mod_Vof_Gradient_Iterative(mult, vof % n(-nb:nc),   &
+                                                   vof % x(-nb:nc),   &
+                                                   vof % y(-nb:nc),   &
+                                                   vof % z(-nb:nc))
 
   ! If distance function is calculated
   if (mult % d_func) then
