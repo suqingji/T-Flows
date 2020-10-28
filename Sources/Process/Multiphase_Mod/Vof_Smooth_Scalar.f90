@@ -31,7 +31,7 @@
   nc = grid % n_cells
 
   ! Copy the values from phi % n to local variable
-  smooth_var(:) = var(:)
+  smooth_var(-nb:nc) = var(-nb:nc)
 
   do c_iter = 1, n_conv
 
@@ -71,19 +71,19 @@
     call Grid_Mod_Exchange_Cells_Real(grid, sum_vol_area(-nb:nc))
     call Grid_Mod_Exchange_Cells_Real(grid, sum_area    (-nb:nc))
 
-    if (mult % d_func) then
-      do c = 1, grid % n_cells
-        smooth_var(c) = sum_vol_area(c) / sum_area(c)
-      end do
-    else
-      do c = 1, grid % n_cells
-        smooth_var(c) = max(min(sum_vol_area(c) / sum_area(c), 1.0), 0.0)
-        smooth_var(c) = sum_vol_area(c) / sum_area(c)
-      end do
-    end if
+    do c = 1, grid % n_cells
+      smooth_var(c) = sum_vol_area(c) / sum_area(c)
+    end do
+
     call Grid_Mod_Exchange_Cells_Real(grid, smooth_var)
 
   end do
+
+  if (mult % d_func .eqv. .false.) then
+    do c = 1, grid % n_cells
+      smooth_var(c) = max(min(sum_vol_area(c) / sum_area(c), 1.0), 0.0)
+    end do
+  end if
 
   ! At boundaries
   do s = 1, grid % n_bnd_faces
