@@ -1,7 +1,5 @@
 !==============================================================================!
 !   Introduce new types to be used with User_Mod                               !
-!------------------------------------------------------------------------------!
-  implicit none
 !==============================================================================!
 
   type probe
@@ -12,7 +10,7 @@
   end type probe
 
   ! Probes for height
-  type(probe) :: probes(4)
+  type(probe), target :: probes(4)
 
   ! Probes for pressure
   integer, allocatable :: nod_probe(:)
