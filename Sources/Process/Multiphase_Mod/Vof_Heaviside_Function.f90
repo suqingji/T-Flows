@@ -29,7 +29,7 @@
 
   do c = 1, grid % n_cells
 
-    eps_grid = 1.5 * grid % vol(c) ** ONE_THIRD
+    eps_grid = mult % heavyside_mollified_factor * grid % vol(c) ** ONE_THIRD
 
     if (dist_func % n(c) > eps_grid) then
       heaviside(c) = 1.0
@@ -37,8 +37,8 @@
       heaviside(c) = 0.0
     else
       heaviside(c) = 0.5 * ( 1.0 + dist_func % n(c) / eps_grid       &
-                            + 1.0 / PI * sin(PI * dist_func % n(c)    &
-                            / eps_grid))
+                           + 1.0 / PI * sin(PI * dist_func % n(c)    &
+                           / eps_grid))
     end if
 
   end do
@@ -51,11 +51,6 @@
       heaviside(c2) = heaviside(c1)
     end if
   end do
-
-  ! Find gradients
-  call Field_Mod_Grad_Component(flow, heaviside(-nb:nc), 1, vof % x)
-  call Field_Mod_Grad_Component(flow, heaviside(-nb:nc), 2, vof % y)
-  call Field_Mod_Grad_Component(flow, heaviside(-nb:nc), 3, vof % z)
 
   ! Store Heavyside function for the pressure correction step
   dist_func % oo(-nb:nc) = heaviside(-nb:nc)
