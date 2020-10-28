@@ -50,6 +50,9 @@
     ! Skewness correction
     logical           :: skew_corr
 
+    ! Method for curvature calculation
+    logical           :: least_squares_curvature
+
     ! For calculation of distance function
     logical           :: d_func
 
@@ -80,6 +83,7 @@
     ! User defined parameters for distance function
     integer :: t_dist_scheme
     real    :: c_tau, c_eps
+    real    :: heavyside_mollified_factor
 
     ! Averaging
     integer, allocatable :: avg_cells(:,:)
@@ -122,6 +126,7 @@
   include 'Multiphase_Mod/Vof_Curvature_Csf.f90'
   include 'Multiphase_Mod/Vof_Curvature_Nodal.f90'
   include 'Multiphase_Mod/Vof_Find_Upstream_Phi.f90'
+  include 'Multiphase_Mod/Vof_Gradient_Iterative.f90'
   include 'Multiphase_Mod/Vof_Heaviside_Function.f90'
   include 'Multiphase_Mod/Vof_Mass_Transfer.f90'
   include 'Multiphase_Mod/Vof_Mass_Transfer_Rate_In.f90'
