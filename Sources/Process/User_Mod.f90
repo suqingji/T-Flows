@@ -38,6 +38,7 @@
   include 'User_Mod/Save_Results.f90'
   include 'User_Mod/Save_Swarm.f90'
   include 'User_Mod/Source.f90'
+  include 'User_Mod/User_Types.f90'
 
   end module 
 
