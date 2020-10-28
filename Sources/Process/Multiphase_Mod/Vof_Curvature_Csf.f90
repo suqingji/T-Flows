@@ -9,7 +9,8 @@
   use Work_Mod, only: div_x => r_cell_10,  &
                       div_y => r_cell_11,  &
                       div_z => r_cell_12,  &
-                      vof_n => r_node_01
+                      vof_n => r_node_01,  &
+                      c_ind => i_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -28,6 +29,7 @@
   type(Var_Type),       pointer :: vof
   integer                       :: s, c, c1, c2, n, i_fac,i_nod, tot_cells,sub
   integer                       :: c_inte, fu, nb, nc
+  integer                       :: avgi, n_avg, icell, cc
   real, contiguous,     pointer :: fs_x(:), fs_y(:), fs_z(:)
   real                          :: vol_face, grad_face(3), d_n(3)
   real                          :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
@@ -40,6 +42,7 @@
   real                          :: v1(3), v2(3), v3(3), v4(3)
   real                          :: gf_x, gf_y, gf_z, curv_loc
   real                          :: costheta0, costheta, a1, a2
+  real                          :: avg_curv, sum_neigh
 !==============================================================================!
 
   vof  => mult % vof
@@ -50,12 +53,43 @@
 
   epsloc = epsilon(epsloc)
 
-  ! Tangent vector to walls/symmetries
+  ! At Boundaries
   do s = 1, grid % n_bnd_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.   &
-        Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+    if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
+      gf_x = grad_kx(c1)
+      gf_y = grad_ky(c1)
+      gf_z = grad_kz(c1)
+
+      norm_grad = norm2((/gf_x, gf_y, gf_z/))
+
+      gf_x = gf_x / (norm_grad + epsloc)
+      gf_y = gf_y / (norm_grad + epsloc)
+      gf_z = gf_z / (norm_grad + epsloc)
+
+      costheta0 = dot_product((/gf_x, gf_y, gf_z/),                          &
+                              (/grid % sx(s), grid % sy(s), grid % sz(s)/))  &
+                 / grid % s(s)
+      theta0 = acos(costheta0)
+
+      theta = vof % q(c2) * PI /180.0
+      costheta = cos(theta)
+
+      a1 = cos(theta0 - theta)
+      a2 = 1.0 - costheta0 * costheta0
+
+      a = (costheta - costheta0 * a1) / (a2 + epsloc)
+      b = (a1 - costheta0 * costheta) / (a2 + epsloc)
+
+      grad_kx(c1) = b * gf_x + a * grid % sx(s) / grid % s(s)
+      grad_ky(c1) = b * gf_y + a * grid % sy(s) / grid % s(s)
+      grad_kz(c1) = b * gf_z + a * grid % sz(s) / grid % s(s)
+      grad_kx(c2) = grad_kx(c1)
+      grad_ky(c2) = grad_ky(c1)
+      grad_kz(c2) = grad_kz(c1)
+
+    else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
 
       norm_grad = norm2((/grad_kx(c1),grad_ky(c1),grad_kz(c1)/))
 
@@ -77,74 +111,7 @@
       grad_ky(c2) = grad_ky(c1)
       grad_kz(c2) = grad_kz(c1)
     end if
-  end do
 
-  mult % curv = 0.0
-
-  ! For contact angle
-  do s = 1, grid % n_bnd_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    curv_loc = 0.0
-    if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-      dotprod = dot_product((/grid % dx(s), grid % dy(s), grid % dz(s)/),   &
-                            (/grid % sx(s), grid % sy(s), grid % sz(s)/))
-
-      dotprod2 = grad_kx(c1) * grid % dx(s)   &
-               + grad_ky(c1) * grid % dy(s)   &
-               + grad_kz(c1) * grid % dz(s)
-
-      gf_x = grad_kx(c1) + grid % sx(s) / dotprod    &
-           * (curr_colour(c2) - curr_colour(c1) - dotprod2)
-      gf_y = grad_ky(c1) + grid % sy(s) / dotprod    &
-           * (curr_colour(c2) - curr_colour(c1) - dotprod2)
-      gf_z = grad_kz(c1) + grid % sz(s) / dotprod    &
-           * (curr_colour(c2) - curr_colour(c1) - dotprod2)
-
-      norm_grad = norm2((/gf_x, gf_y, gf_z/))
-
-      if(norm_grad > epsloc) then
-
-        gf_x = gf_x / (norm_grad + epsloc)
-        gf_y = gf_y / (norm_grad + epsloc)
-        gf_z = gf_z / (norm_grad + epsloc)
-
-        costheta0 = dot_product((/gf_x, gf_y, gf_z/),   &
-                                 (/grid % sx(s), grid % sy(s), grid % sz(s)/)) &
-                   / grid % s(s)
-        theta0 = acos(costheta0)
-
-        theta = vof % q(c2) * PI /180.0
-        costheta = cos(theta)
-
-        a1 = cos(theta0 - theta)
-        a2 = 1.0 - costheta0 * costheta0
-
-        a = (costheta - costheta0 * a1) / (a2 + epsloc)
-        b = (a1 - costheta0 * costheta) / (a2 + epsloc)
-
-        grad_kx(c1) = b * gf_x + a * grid % sx(s) / grid % s(s)
-        grad_ky(c1) = b * gf_y + a * grid % sy(s) / grid % s(s)
-        grad_kz(c1) = b * gf_z + a * grid % sz(s) / grid % s(s)
-        grad_kx(c2) = grad_kx(c1)
-        grad_ky(c2) = grad_ky(c1)
-        grad_kz(c2) = grad_kz(c1)
-      end if
-
-    end if
-
-  end do
-
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_kx(-nb:nc))
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_ky(-nb:nc))
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_kz(-nb:nc))
-
-  ! Normalize vector at cells
-  do c = 1, grid % n_cells
-    norm_grad = sqrt(grad_kx(c) ** 2 + grad_ky(c) ** 2 + grad_kz(c) ** 2)
-    grad_kx(c) = grad_kx(c) / (norm_grad + epsloc)
-    grad_ky(c) = grad_ky(c) / (norm_grad + epsloc)
-    grad_kz(c) = grad_kz(c) / (norm_grad + epsloc)
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, grad_kx(-nb:nc))
@@ -157,22 +124,109 @@
 
   mult % curv = 0.0
 
-  ! Find divergence of normals
-  call Field_Mod_Grad_Component(flow, grad_kx(-nb:nc),  &
-                                1,    div_x  (-nb:nc),  &
-                                impose_symmetry = .false.)
-  call Field_Mod_Grad_Component(flow, grad_ky(-nb:nc),  &
-                                2,    div_y  (-nb:nc),  &
-                                impose_symmetry = .false.)
-  call Field_Mod_Grad_Component(flow, grad_kz(-nb:nc),  &
-                                3,    div_z  (-nb:nc),  &
-                                impose_symmetry = .false.)
+  if(mult % least_squares_curvature) then
 
-  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_x(-nb:nc)
-  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_y(-nb:nc)
-  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_z(-nb:nc)
+    ! Normalize vector at cells
+    do c = -nb, nc
+      norm_grad = norm2((/grad_kx(c), grad_ky(c), grad_kz(c)/))
+      grad_kx(c) = grad_kx(c) / (norm_grad + epsloc)
+      grad_ky(c) = grad_ky(c) / (norm_grad + epsloc)
+      grad_kz(c) = grad_kz(c) / (norm_grad + epsloc)
+    end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
+    ! Find divergence of normals
+    call Field_Mod_Grad_Component(flow, grad_kx(-nb:nc),  &
+                                  1,    div_x  (-nb:nc),  &
+                                  impose_symmetry = .false.)
+    call Field_Mod_Grad_Component(flow, grad_ky(-nb:nc),  &
+                                  2,    div_y  (-nb:nc),  &
+                                  impose_symmetry = .false.)
+    call Field_Mod_Grad_Component(flow, grad_kz(-nb:nc),  &
+                                  3,    div_z  (-nb:nc),  &
+                                  impose_symmetry = .false.)
+
+    mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_x(-nb:nc)
+    mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_y(-nb:nc)
+    mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_z(-nb:nc)
+
+    call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
+
+  else ! Divergence theorem method
+
+    ! Normalize vector at cells
+    do c = -nb, nc
+      norm_grad = norm2((/grad_kx(c), grad_ky(c), grad_kz(c)/))
+      grad_kx(c) = grad_kx(c) / (norm_grad + epsloc)
+      grad_ky(c) = grad_ky(c) / (norm_grad + epsloc)
+      grad_kz(c) = grad_kz(c) / (norm_grad + epsloc)
+    end do
+
+    ! Boundary faces
+    do s = 1, grid % n_bnd_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+        grad_face(1) = grad_kx(c2)
+        grad_face(2) = grad_ky(c2)
+        grad_face(3) = grad_kz(c2)
+      else
+        grad_face(1) = grad_kx(c1)
+        grad_face(2) = grad_ky(c1)
+        grad_face(3) = grad_kz(c1)
+      end if
+
+      sxyz_mod = norm2((/grad_face(1), grad_face(2), grad_face(3)/))
+
+      dotprod = (grad_face(1) * grid % sx(s)                            &
+               + grad_face(2) * grid % sy(s)                            &
+               + grad_face(3) * grid % sz(s)) / ( sxyz_mod + epsloc )
+
+      sxyz_control = norm2((/vof % x(c1),vof % y(c1),vof % z(c1)/))
+
+      if (sxyz_control > epsloc) then
+        mult % curv(c1) = mult % curv(c1) + dotprod
+      end if
+    end do
+
+    ! Interior faces
+    do s = grid % n_bnd_faces + 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      fs = grid % f(s)
+
+      grad_face(1) = fs * grad_kx(c1) + (1.0 - fs) * grad_kx(c2)
+      grad_face(2) = fs * grad_ky(c1) + (1.0 - fs) * grad_ky(c2)
+      grad_face(3) = fs * grad_kz(c1) + (1.0 - fs) * grad_kz(c2)
+
+      sxyz_mod = sqrt(grad_face(1) ** 2  &
+                    + grad_face(2) ** 2  &
+                    + grad_face(3) ** 2)
+
+      dotprod = (grad_face(1) * grid % sx(s)  &
+               + grad_face(2) * grid % sy(s)  &
+               + grad_face(3) * grid % sz(s)) / ( sxyz_mod + epsloc )
+
+      sxyz_control = norm2((/vof % x(c1),vof % y(c1),vof % z(c1)/))
+
+      if (sxyz_control > epsloc) then
+        mult % curv(c1) = mult % curv(c1) + dotprod
+      end if
+
+      sxyz_control = norm2((/vof % x(c2),vof % y(c2),vof % z(c2)/))
+
+      if (sxyz_control > epsloc) then
+        mult % curv(c2) = mult % curv(c2) - dotprod
+      end if
+
+    end do
+
+    call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
+
+    do c = 1, grid % n_cells
+      mult % curv(c) = - mult % curv(c) / grid % vol(c)
+    end do
+
+  end if
 
   ! At boundaries
   do s = 1, grid % n_bnd_faces
@@ -183,17 +237,6 @@
 
   call Multiphase_Mod_Vof_Smooth_Curvature(grid, mult,                  &
                           grad_kx(-nb:nc), grad_ky(-nb:nc), grad_kz(-nb:nc))
-
-  ! At boundaries
-  do s = 1, grid % n_bnd_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-      if(abs(mult % curv(c1)) > epsloc) then
-        mult % curv(c1) = mult % curv(c2)
-      endif
-    end if
-  end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
 
