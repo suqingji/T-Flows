@@ -94,6 +94,13 @@
 
   call Field_Mod_Grad_Variable(flow, dist_func)
 
+  call Multiphase_Mod_Vof_Solver_Dist_Function_Cell_Loop(flow,            &
+                                                         a,               &
+                                                         dist_func % n,   &
+                                                         r_phi,           &
+                                                         dist_func % x,   &
+                                                         dist_func % y,   &
+                                                         dist_func % z)
   !--------------------------------!
   !   Modified distance function   !
   !--------------------------------!
@@ -117,9 +124,7 @@
 
     s_0(c) = dist_func % n(c)                                         &
            / sqrt(  dist_func % n(c) ** 2                             &
-                  + (norm2((/dist_func % x(c) ** 2,                   &
-                             dist_func % y(c) ** 2,                   &
-                             dist_func % z(c) ** 2/)) * delta) ** 2)
+                  + (r_phi(c) * delta) ** 2  )
   end do
 
   solv_iter = 0
@@ -153,11 +158,10 @@
 
       ! Loop on cells
 
-      call Multiphase_Mod_Vof_Solver_Dist_Function_Cell_Loop(grid,        &
+      call Multiphase_Mod_Vof_Solver_Dist_Function_Cell_Loop(flow,        &
                                                              a,           &
                                                              dist_curr,   &
                                                              r_phi,       &
-                                                             s_0,         &
                                                              grad_i,      &
                                                              grad_j,      &
                                                              grad_k)
@@ -165,7 +169,7 @@
       select case (irk)
       case(1)
         do c = 1, grid % n_cells
-          dist_func % oo(c) = r_phi(c) * d_tau + dist_func % n(c)
+          dist_func % oo(c) = s_0(c) * (1.0 - r_phi(c)) * d_tau + dist_func % n(c)
         end do
 
         ! Update boundaries
@@ -179,8 +183,8 @@
 
       case(2)
         do c = 1, grid % n_cells
-          dist_func % o(c) = 0.25 * r_phi(c) * d_tau   &
-                           + 0.75 * dist_func % n(c)   &
+          dist_func % o(c) = 0.25 * s_0(c) * (1.0 - r_phi(c)) * d_tau   &
+                           + 0.75 * dist_func % n(c)                    &
                            + 0.25 * dist_func % oo(c)
         end do
 
@@ -194,8 +198,8 @@
         end do
       case(3)
         do c = 1, grid % n_cells
-          dist_func % n(c) = TWO_THIRDS * r_phi(c) * d_tau   &
-                           + ONE_THIRD * dist_func % n(c)    &
+          dist_func % n(c) = TWO_THIRDS * s_0(c) * (1.0 - r_phi(c)) * d_tau   &
+                           + ONE_THIRD  * dist_func % n(c)                    &
                            + TWO_THIRDS * dist_func % o(c)
         end do
 
