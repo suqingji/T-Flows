@@ -14,12 +14,15 @@
 !-----------------------------------[Locals]---------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
-  type(Var_Type),    pointer :: vof
+  type(Var_Type),    pointer :: vof, avg_var
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: surf_fx(:), surf_fy(:), surf_fz(:)
-  integer                    :: s, c, c1, c2, nt, ni
+  real, contiguous,  pointer :: si(:)
+  real,              pointer :: u_relax, dt_corr
+  integer                    :: s, c, c1, c2, nt, ni, i_dir
+  real                       :: gf_x, gf_y, gf_z, correction
   real                       :: dotprod, epsloc, fs
   real                       :: corr_x, corr_y, corr_z
   real                       :: u_f, v_f, w_f
@@ -35,6 +38,7 @@
   v_flux  => flow % v_flux
   a       => sol % a
   b       => sol % b % val
+  u_relax => flow % u_rel_corr
 
   epsloc = epsilon(epsloc)
 
@@ -93,6 +97,41 @@
       do s = grid % n_bnd_faces + 1, grid % n_faces
         v_flux % star(s) = v_flux % n(s)
       end do
+
+      if (mult % skew_corr ) then
+        do i_dir = 1, 3
+          select case(i_dir)
+          case(1)
+            avg_var => flow % u
+            si      => grid % sx
+          case(2)
+            avg_var => flow % v
+            si      => grid % sy
+          case(3)
+            avg_var => flow % w
+            si      => grid % sz
+          end select
+
+          call Field_Mod_Grad_Variable(flow, avg_var)
+
+          do s = grid % n_bnd_faces + 1, grid % n_faces
+            c1 = grid % faces_c(1,s)
+            c2 = grid % faces_c(2,s)
+            fs = grid % f(s)
+
+            ! Add new velocity component correction
+            gf_x = fs * avg_var % x(c1) + (1.0 - fs) * avg_var % x(c2)
+            gf_y = fs * avg_var % y(c1) + (1.0 - fs) * avg_var % y(c2)
+            gf_z = fs * avg_var % z(c1) + (1.0 - fs) * avg_var % z(c2)
+
+            correction = dot_product( (/gf_x, gf_y, gf_z/),                    &
+                         (/grid % xr(s), grid % yr(s), grid % zr(s)/)) * si(s)
+
+            v_flux % avg(s) = v_flux % avg(s) + correction
+
+          end do
+        end do
+      end if
     end if
   end if
 
