@@ -25,9 +25,8 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  ! Refresh buffers
-  call Grid_Mod_Exchange_Cells_Real(grid, phic)
-  call Field_Mod_Interpolate_Cells_To_Nodes(flow, phic, phin)
+  ! Do not refresh buffers and nodal values because
+  ! curvature at the walls are imposed outside
 
   ! Initialize gradients at nodes
   phii(1:grid % n_nodes) = 0.
