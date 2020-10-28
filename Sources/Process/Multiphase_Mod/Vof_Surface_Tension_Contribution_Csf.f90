@@ -50,7 +50,7 @@
     !   its gradients in grad_kx, grad_ky and grad_kz   !
     !---------------------------------------------------!
     if (mult % n_conv_curv > 0) then
-      call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % oo, &
+      call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % n, &
                                      smooth_var(-nb:nc), mult % n_conv_curv)
 
       call Field_Mod_Grad(flow, smooth_var(-nb:nc), grad_kx(-nb:nc),  &
@@ -64,33 +64,9 @@
     !   and store them in grad_kx, grad_ky and grad_kz   !
     !----------------------------------------------------!
     else
-      call Field_Mod_Grad(flow, mult % dist_func % oo, grad_kx(-nb:nc),  &
+      call Field_Mod_Grad(flow, mult % dist_func % n , grad_kx(-nb:nc),  &
                                                        grad_ky(-nb:nc),  &
                                                        grad_kz(-nb:nc))
-    end if
-
-    !-----------------------------------------------------------------!
-    !   Smoothing of normal is engaged                                !
-    !                                                                 !
-    !   Smooth distance function (why oo?), compute its gradients,    !
-    !   store them intermediatelly in grad_nx, grad_ny and grad_nz,   !
-    !   and then store them in vof % x, vof % y and vof % z.          !
-    !   Don't use again the grad_nx, grad_ny and grad_nz.             !
-    !-----------------------------------------------------------------!
-    if (mult % n_conv_norm > 0) then
-      call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % oo, &
-                                     smooth_var(-nb:nc), mult % n_conv_norm)
-
-      call Field_Mod_Grad(flow, smooth_var(-nb:nc), grad_nx(-nb:nc),  &
-                                                    grad_ny(-nb:nc),  &
-                                                    grad_nz(-nb:nc))
-      vof % x(-nb:nc) = grad_nx(-nb:nc)
-      vof % y(-nb:nc) = grad_ny(-nb:nc)
-      vof % z(-nb:nc) = grad_nz(-nb:nc)
-    else
-      call Field_Mod_Grad(flow, mult % dist_func % oo, vof % x,  &
-                                                       vof % y,  &
-                                                       vof % z)
     end if
 
   !-----------------------------!
@@ -126,26 +102,6 @@
       grad_kz(-nb:nc) = vof % z(-nb:nc)
     end if
 
-    !-----------------------------------------------------------------!
-    !   Smoothing of normal is engaged                                !
-    !                                                                 !
-    !   Smooth volume of fluid function, compute its gradients,       !
-    !   store them intermediatelly in grad_nx, grad_ny and grad_nz,   !
-    !   and then store them in vof % x, vof % y and vof % z.          !
-    !   Don't use again the grad_nx, grad_ny and grad_nz.             !
-    !-----------------------------------------------------------------!
-    if (mult % n_conv_norm > 0) then
-      call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n,   &
-                                     smooth_var(-nb:nc), mult % n_conv_norm)
-
-      call Field_Mod_Grad(flow, smooth_var(-nb:nc), grad_nx(-nb:nc),  &
-                                                    grad_ny(-nb:nc),  &
-                                                    grad_nz(-nb:nc))
-
-      vof % x(-nb:nc) = grad_nx(-nb:nc)
-      vof % y(-nb:nc) = grad_ny(-nb:nc)
-      vof % z(-nb:nc) = grad_nz(-nb:nc)
-    end if
   end if
 
   !------------------------------------------------------!
