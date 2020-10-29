@@ -2,6 +2,10 @@
   subroutine Multiphase_Mod_Vof_Coefficients(mult, a, b, dt, beta_f)
 !------------------------------------------------------------------------------!
 !   Computes matrix coefficients for volume fraction equation                  !
+!                                                                              !
+!   Arguments:                                                                 !
+!   - beta_f                     : Coefficient beta at faces, governs the      !
+!                                  advection of vof using CICSAM               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -1,9 +1,8 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Surface_Tension_Contribution_Nodal(mult)
 !------------------------------------------------------------------------------!
-!    Computes the Curvature based on old-fashioned Brackbill's CSF approach    !
-!    but using nodal values                                                    !
-!------------------------------------------------------------------------------!
+!   Smoothes distance function or vof and interpolates such values to nodal    !
+!   locations required for curvature calculation                               !
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: smooth_k   => r_cell_08,    &
                       smooth_n   => r_cell_09,    &

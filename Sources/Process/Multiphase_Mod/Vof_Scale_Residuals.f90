@@ -1,7 +1,8 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Scale_Residuals(mult, sol, ini, all_vel)
 !------------------------------------------------------------------------------!
-!   Scales residuals for PISO algorithm                                        !
+!   Scales velocity residuals for PISO algorithm if all_vel is true. Otherwise,!
+!   Temperature residuals are scaled                                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

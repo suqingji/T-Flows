@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Predict_Beta(mult, grid, beta_f, beta_c, c_d)
+  subroutine Multiphase_Mod_Vof_Predict_Beta(mult, grid, beta_f, c_d)
 !------------------------------------------------------------------------------!
-!   Step 1 of CICSAM: Compute beta for computation of volume fraction          !
+!   Step 1 of CICSAM: Compute beta_f for computation of volume fraction        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   type(Grid_Type)               :: grid
   real                          :: beta_f(grid % n_faces)
-  real                          :: beta_c(grid % n_faces)  ! skew. correction
   real                          :: c_d(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
@@ -113,7 +112,7 @@
           if (abs(1.0 - alfa_d_til) > epsloc) then
 
             beta_f(s) = min(max((alfa_f_til - alfa_d_til)                   &
-                              / (1.0 - alfa_d_til) + beta_c(s), 0.0), 1.0)
+                              / (1.0 - alfa_d_til), 0.0), 1.0)
 
           end if
         end if
@@ -190,7 +189,7 @@
           if (abs(1.0 - alfa_d_til) > epsloc) then
 
             beta_f(s) = min(max((alfa_f_til - alfa_d_til)                   &
-                              / (1.0 - alfa_d_til) + beta_c(s), 0.0), 1.0)
+                              / (1.0 - alfa_d_til), 0.0), 1.0)
 
           end if
 

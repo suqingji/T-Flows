@@ -3,7 +3,14 @@
                                               grad_kx, grad_ky, grad_kz,   &
                                               curr_colour)
 !------------------------------------------------------------------------------!
-!   Computes the Curvature based on Brackbill's CSF using Gauss theorem        !
+!   Computes the Curvature based on Brackbill's CSF using Least Squares method !
+!   or Gauss theorem                                                           !
+!                                                                              !
+!   Arguments:                                                                 !
+!   - grad_kx, grad_ky, grad_kz: gradient components of curr_colour            !
+!   - curr_colour              : it can be the distance function or vof.       !
+!                                In any case, they have been smoothed out      !
+!                                previously to enhance curvature calculation   !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: div_x => r_cell_10,  &

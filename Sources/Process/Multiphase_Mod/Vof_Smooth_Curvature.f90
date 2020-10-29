@@ -4,7 +4,11 @@
 !------------------------------------------------------------------------------!
 !   Smoothes curvature in two steps: first a smoothing curvature around the    !
 !   Interface and second in the direction of the normal. This technique can    !
-!   be found at https://spiral.imperial.ac.uk/handle/10044/1/28101
+!   be found at https://spiral.imperial.ac.uk/handle/10044/1/28101             !
+!                                                                              !
+!   Arguments:                                                                 !
+!   - norm_nx, norm_ny, norm_nz     : Components of the gradient of smooothed  !
+!                                     Distance function or vof                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: k_star       => r_cell_14,    &

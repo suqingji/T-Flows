@@ -2,7 +2,15 @@
   subroutine Multiphase_Mod_Vof_Curvature_Nodal(grid, mult, smooth_k,   &
                                                 var_node_k)
 !------------------------------------------------------------------------------!
-!   Computes the Curvature based on Brackbill's CSF using nodal gradients      !
+!   Computes the Curvature based on Brackbill's CSF using Least Squares method !
+!   and nodal values                                                           !
+!                                                                              !
+!   Arguments:                                                                 !
+!   - smooth_k, var_node_k          : Both hold the distance function or vof at!
+!                                     cell centers and nodes respectively.     !
+!                                     In any case, they have been smoothed out !
+!                                     previously to enhance curvature          !
+!                                     calculation                              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: div_x  => r_cell_11,  &

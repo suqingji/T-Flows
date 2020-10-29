@@ -1,7 +1,8 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Boundary_Extrapolation(grid, mult, var)
 !------------------------------------------------------------------------------!
-!   Computes the Curvature based on Brackbill's CSF using Gauss theorem        !
+!   Computes values of some scalar var at boundary faces. This technique can   !
+!   be found at https://spiral.imperial.ac.uk/handle/10044/1/28101             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: grad_x => r_cell_21,   &

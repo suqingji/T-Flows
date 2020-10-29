@@ -1,7 +1,8 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
 !------------------------------------------------------------------------------!
-!   Correct fluxes on pressure equation due to surface tension and gravity     !
+!   Correct fluxes on pressure equation due to surface tension, temporal terms,!
+!   under relaxation and skewness                                              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: curr_colour => r_cell_01,  &

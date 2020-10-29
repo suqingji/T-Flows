@@ -3,6 +3,10 @@
                                               smooth_var, n_conv)
 !------------------------------------------------------------------------------!
 !    Smoothes scalar using a laplacian smoother                                !
+!                                                                              !
+!    Arguments:                                                                !
+!    - var, smooth_var, n_conv     : Scalar var, its smoothed form after n_conv!
+!                                    iterations.                               !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: sum_vol_area => r_cell_01,   &

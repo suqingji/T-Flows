@@ -4,6 +4,7 @@
 !   Calculates distance function using VOF as initialization. This is done     !
 !   based on the paper of Dianat 2017, "A Coupled Level Set and Volume of      !
 !   Fluid method for automotive exterior water management applications"        !
+!   http://dx.doi.org/10.1016/j.ijmultiphaseflow.2017.01.008
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: r_phi     => r_cell_05, &

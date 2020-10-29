@@ -5,7 +5,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: beta_f => r_face_01,  &
-                      beta_c => r_face_02,  &
                       c_d    => r_cell_30
 !------------------------------------------------------------------------------!
   implicit none
@@ -135,7 +134,7 @@
                                                        vof % y(-nb:nc),   &
                                                        vof % z(-nb:nc))
 
-      call Multiphase_Mod_Vof_Predict_Beta(mult, grid, beta_f, beta_c, c_d)
+      call Multiphase_Mod_Vof_Predict_Beta(mult, grid, beta_f, c_d)
 
       loop_corr:  do corr_num = 1, corr_num_max
         !-------------------------!

@@ -1,7 +1,8 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Surface_Tension_Contribution_Csf(mult)
 !------------------------------------------------------------------------------!
-!   Computes the Curvature based on Brackbill's CSF approach                   !
+!   Smoothes distance function or vof and computes Gradients needed for        !
+!   Curvature based on Brackbill's CSF approach                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: grad_nx    => r_cell_03,  & ! grad on x of vof for normal

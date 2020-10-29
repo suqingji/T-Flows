@@ -1,7 +1,13 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Gradient_Iterative(mult, var, g_x, g_y, g_z)
 !------------------------------------------------------------------------------!
-!   Computes the Curvature based on Brackbill's CSF using nodal gradients      !
+!   Computes de gradient of scalr var. using Gauss theorem in a iterative way  !
+!   to take into account skewness and to produce values at faces that can be   !
+!   reconstructed using gradients at cells. This technique can be found at     !
+!   https://spiral.imperial.ac.uk/handle/10044/1/28101                         !
+!                                                                              !
+!   Arguments:                                                                 !
+!   - g_x, g_y, g_z                 : Gradient components of var               !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: aux_x  => r_cell_27,  &

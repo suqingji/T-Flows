@@ -2,6 +2,11 @@
   subroutine Multiphase_Mod_Vof_Correct_Beta(mult, grid, beta_f, c_d)
 !------------------------------------------------------------------------------!
 !   Step 2 of CICSAM: Correct beta for computation of volume fraction          !
+!                                                                              !
+!   Arguments                                                                  !
+!   - beta_f                     : Coefficient beta at faces, governs the      !
+!                                  advection of vof using CICSAM               !
+!   - c_d                        : Courant number at cells                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -1,9 +1,10 @@
 !============================================================================!
   subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
 !----------------------------------------------------------------------------!
-!   Computes Surface tension, Gravity and phase change sources for Momentum  !
-!   Equation if a two-phase flow calculation is performed. Additionally and  !
-!   for the moment, PISO calculations are run here                           !
+!   Computes Surface tension sources for Momentum equation if a two-phase    !
+!   flow calculation is performed. Additionally correction for under         !
+!   relaxation and skewness of velocity of the previous iteration is         !
+!   performed                                                                !
 !----------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]--------------------------------!

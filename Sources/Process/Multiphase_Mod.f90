@@ -29,6 +29,9 @@
     ! Surface curvature
     real, allocatable :: curv(:)
 
+    ! Heaviside function
+    real, allocatable :: heaviside_func(:)
+
     ! Surface normals
     real, allocatable :: nx(:), ny(:), nz(:)
 

@@ -4,7 +4,12 @@
 !------------------------------------------------------------------------------!
 !   Computes the value of phi at a imaginary upstream cell. This is based on   !
 !   Work of Zhang (2014) "Assessment of different reconstruction techniques    !
-!          for implementing the NVSF schemes on unstructured meshes"           !
+!   for implementing the NVSF schemes on unstructured meshes" 10.1002/fld.3846 !
+!                                                                              !
+!   Arguments:                                                                 !
+!   - phi_x, phi_y, phi_z          : Gradient components of variable phi       !
+!   - s, donor, accept             : face s inbetween cells donor and accept   !
+!   - phi_u                        : imaginary upstream cell
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

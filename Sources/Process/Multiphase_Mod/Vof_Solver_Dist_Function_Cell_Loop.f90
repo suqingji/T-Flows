@@ -8,7 +8,12 @@
                                                                grad_k)
 !------------------------------------------------------------------------------!
 !    Loop on cells for calculation of the Distance function. This function     !
-!    only reduces the size of Compute_Distance_Function
+!    only reduces the size of subroutine Compute_Distance_Function             !
+!                                                                              !
+!    Arguments:                                                                !
+!    - dist_curr                       : distance function at current iteration!
+!    - r_phi                           : norm of gradient of dist_curr         !
+!    - grad_i, grad_j, grad_k          : gradient components of dist_curr      !
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: gra_x  => r_node_05,  &
                       gra_y  => r_node_06,  &

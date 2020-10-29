@@ -1,7 +1,8 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Heaviside_Function(mult)
 !------------------------------------------------------------------------------!
-!   Computes the Heaviside function, necessary for Brackbill's CSF approach    !
+!   Computes the Heaviside function, necessary to thicken curvature when using !
+!   the distance function                                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -4,7 +4,7 @@
 !   Computes the Maximum Courant Number at cells. The argument interf helps    !
 !   selecting if calculation will be performed close the interface, which      !
 !   in turn will modify the time step if necessary and perform a simple        !
-!   stepping approach. If interf = 0, then calculation is made everywhere      !
+!   stepping approach. If interf = 0, then calculation in all cells            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
