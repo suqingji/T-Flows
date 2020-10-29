@@ -30,7 +30,7 @@
 
   ! Take aliases
   if (mult % d_func) then
-    vof => mult % dist_func % oo
+    vof => mult % heaviside_func
   else
     vof => mult % vof % n
   end if

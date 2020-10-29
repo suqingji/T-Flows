@@ -3,9 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Computes the Heaviside function, necessary for Brackbill's CSF approach    !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: heaviside => r_cell_13
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
@@ -32,13 +29,13 @@
     eps_grid = mult % heavyside_mollified_factor * grid % vol(c) ** ONE_THIRD
 
     if (dist_func % n(c) > eps_grid) then
-      heaviside(c) = 1.0
+      mult % heaviside_func(c) = 1.0
     else if (dist_func % n(c) < -eps_grid) then
-      heaviside(c) = 0.0
+      mult % heaviside_func(c) = 0.0
     else
-      heaviside(c) = 0.5 * ( 1.0 + dist_func % n(c) / eps_grid       &
-                           + 1.0 / PI * sin(PI * dist_func % n(c)    &
-                           / eps_grid))
+      mult % heaviside_func(c) = 0.5 * ( 1.0 + dist_func % n(c) / eps_grid     &
+                                       + 1.0 / PI * sin(PI * dist_func % n(c)  &
+                                       / eps_grid))
     end if
 
   end do
@@ -48,11 +45,10 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if (c2 < 0) then
-      heaviside(c2) = heaviside(c1)
+      mult % heaviside_func(c2) = mult % heaviside_func(c1)
     end if
   end do
 
-  ! Store Heavyside function for the pressure correction step
-  dist_func % oo(-nb:nc) = heaviside(-nb:nc)
+  call Grid_Mod_Exchange_Cells_Real(grid, mult % heaviside_func(-nb:nc))
 
   end subroutine

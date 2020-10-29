@@ -30,6 +30,9 @@
 
   ! Surface curvature
   allocate(mult % curv(-nb:nc));  mult % curv(-nb:nc) = 0.0
+  
+  ! Heaviside function
+  allocate(mult % heaviside_func(-nb:nc));  mult % heaviside_func(-nb:nc) = 0.0
 
   ! Surface normals
   allocate(mult % nx(-nb:nc));  mult % nx(-nb:nc) = 0.0

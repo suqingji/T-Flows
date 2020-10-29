@@ -68,7 +68,7 @@
     !   Smooth distance function (why n?) and store it in smooth_n array   !
     !----------------------------------------------------------------------!
     if (mult % n_conv_norm > 0) then
-      call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % n, &
+      call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % heaviside_func, &
                                      smooth_n(-nb:nc), mult % n_conv_norm)
 
     !-----------------------------------------------------------!
@@ -77,7 +77,7 @@
     !   Store distance function's (why oo?) in smooth_n array   !
     !-----------------------------------------------------------!
     else
-      smooth_n(-nb:nc) = mult % dist_func % oo(-nb:nc)
+      smooth_n(-nb:nc) = mult % heaviside_func(-nb:nc)
     end if
     call Field_Mod_Interpolate_Cells_To_Nodes(flow,                     &
                                         smooth_n(-nb:nc), var_node_n(1:nn))

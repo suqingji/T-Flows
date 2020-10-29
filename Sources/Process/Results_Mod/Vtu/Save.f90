@@ -389,7 +389,7 @@
                               f8, f9, data_offset, run)
 
         call Save_Scalar_Real(grid, "HeavisideFunction", plot_inside,      &
-                              mult % dist_func % oo(-grid % n_bnd_cells),  &
+                              mult % heaviside_func(-grid % n_bnd_cells),  &
                               f8, f9, data_offset, run)
       end if
     end if
