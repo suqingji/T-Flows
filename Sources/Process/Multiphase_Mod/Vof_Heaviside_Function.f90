@@ -27,7 +27,7 @@
 
   do c = 1, grid % n_cells
 
-    eps_grid = mult % heavyside_mollified_factor * grid % vol(c) ** ONE_THIRD
+    eps_grid = mult % heaviside_mollified_factor * grid % vol(c) ** ONE_THIRD
 
     if (dist_func % n(c) > eps_grid) then
       mult % heaviside_func(c) = 1.0

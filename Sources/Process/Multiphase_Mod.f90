@@ -86,7 +86,7 @@
     ! User defined parameters for distance function
     integer :: t_dist_scheme
     real    :: c_tau, c_eps
-    real    :: heavyside_mollified_factor
+    real    :: heaviside_mollified_factor
 
     ! Averaging
     integer, allocatable :: avg_cells(:,:)

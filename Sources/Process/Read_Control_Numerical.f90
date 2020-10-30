@@ -126,7 +126,7 @@
     call Control_Mod_Factor_Fictitious_Time_Vof(mult % c_tau)
     call Control_Mod_Factor_Number_Cells_Distance_Function_Vof(mult % c_eps)
     call Control_Mod_Distance_Function_Time_Integration_Scheme(name)
-    call Control_Mod_Heavyside_Mollified_Factor(mult % heavyside_mollified_factor)
+    call Control_Mod_Heaviside_Mollified_Factor(mult % heaviside_mollified_factor)
     mult % t_dist_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     ! Reconstruct surface
     call Control_Mod_Track_Front(mult % track_front, .true.)
