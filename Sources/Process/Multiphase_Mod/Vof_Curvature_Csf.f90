@@ -32,24 +32,24 @@
                                    curr_colour(-grid % n_bnd_cells    &
                                               : grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),     pointer :: flow
-  type(Var_Type),       pointer :: vof
-  integer                       :: s, c, c1, c2, n, i_fac,i_nod, tot_cells,sub
-  integer                       :: c_inte, fu, nb, nc
-  integer                       :: avgi, n_avg, icell, cc
-  real, contiguous,     pointer :: fs_x(:), fs_y(:), fs_z(:)
-  real                          :: vol_face, grad_face(3), d_n(3)
-  real                          :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
-  real                          :: dotprod2, stabilize
-  real                          :: n_0(3), n_f(3), n_w(3), reflex(3)
-  real                          :: theta, theta0, a, b, s_vector(3)
-  real                          :: vof_fx, vof_fy, vof_fz, vof_c1, vof_c2, voff
-  real                          :: res1, res2, resul, term_c, sumtot
-  real                          :: sumx, sumy, sumz, norm_grad, coeff
-  real                          :: v1(3), v2(3), v3(3), v4(3)
-  real                          :: gf_x, gf_y, gf_z, curv_loc
-  real                          :: costheta0, costheta, a1, a2
-  real                          :: avg_curv, sum_neigh
+  type(Field_Type), pointer :: flow
+  type(Var_Type),   pointer :: vof
+  integer                   :: s, c, c1, c2, n, i_fac,i_nod, tot_cells,sub
+  integer                   :: c_inte, fu, nb, nc
+  integer                   :: avgi, n_avg, icell, cc
+  real, contiguous, pointer :: fs_x(:), fs_y(:), fs_z(:)
+  real                      :: vol_face, grad_face(3), d_n(3)
+  real                      :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
+  real                      :: dotprod2, stabilize
+  real                      :: n_0(3), n_f(3), n_w(3), reflex(3)
+  real                      :: theta, theta0, a, b, s_vector(3)
+  real                      :: vof_fx, vof_fy, vof_fz, vof_c1, vof_c2, voff
+  real                      :: res1, res2, resul, term_c, sumtot
+  real                      :: sumx, sumy, sumz, norm_grad, coeff
+  real                      :: v1(3), v2(3), v3(3), v4(3)
+  real                      :: gf_x, gf_y, gf_z, curv_loc
+  real                      :: costheta0, costheta, a1, a2
+  real                      :: avg_curv, sum_neigh
 !==============================================================================!
 
   vof  => mult % vof
@@ -142,15 +142,9 @@
     end do
 
     ! Find divergence of normals
-    call Field_Mod_Grad_Component(flow, grad_kx(-nb:nc),  &
-                                  1,    div_x  (-nb:nc),  &
-                                  impose_symmetry = .false.)
-    call Field_Mod_Grad_Component(flow, grad_ky(-nb:nc),  &
-                                  2,    div_y  (-nb:nc),  &
-                                  impose_symmetry = .false.)
-    call Field_Mod_Grad_Component(flow, grad_kz(-nb:nc),  &
-                                  3,    div_z  (-nb:nc),  &
-                                  impose_symmetry = .false.)
+    call Field_Mod_Grad_Component(flow, grad_kx(-nb:nc), 1, div_x(-nb:nc))
+    call Field_Mod_Grad_Component(flow, grad_ky(-nb:nc), 2, div_y(-nb:nc))
+    call Field_Mod_Grad_Component(flow, grad_kz(-nb:nc), 3, div_z(-nb:nc))
 
     mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_x(-nb:nc)
     mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_y(-nb:nc)

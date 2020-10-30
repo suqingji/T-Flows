@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Field_Mod_Grad_Component_Cells_To_Nodes(flow, phic, phin, i, phii)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic variable phi by a least squares method.     !
+!   Calculates gradient of generic variable phi by the least squares method.   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -9,8 +9,8 @@
   real                     :: phic( -flow % pnt_grid % n_bnd_cells  &
                                     :flow % pnt_grid % n_cells)
   real                     :: phin(1:flow % pnt_grid % n_nodes)
-  integer                  :: i
-  real,   intent(out)      :: phii(1:flow % pnt_grid % n_nodes)
+  integer, intent(in)      :: i
+  real,    intent(out)     :: phii(1:flow % pnt_grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer           :: grid
   integer                            :: n, c, i_cel
