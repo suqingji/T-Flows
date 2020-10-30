@@ -1,26 +1,25 @@
 // Define domain and step dimensions
 L_DOM_X  = 3.22;
 L_DOM_Y  = 1.0;
-L_BUF_Y  = 0.05;  // length of buffers in y direction of the domain
+L_BUF_Y  = 0.06;  // length of buffers in y direction of the domain
 L_DOM_Z  = 1.5;
 L_OBST_X = 0.161;
 L_OBST_Y = 0.403;
 L_OBST_Z = 0.161;  // height of the obstacle
 S_OBST_X = 0.6635;  // shift for the obstacle (distance from the left wall)
 
-// Define domain and obstacle resolution (in nodes)
-N_OBST_X = 15;
-N_OBST_Y = 45;
-N_OBST_Z = 13;
+// Define domain and step resolution
+N_OBST_X = 17;
+N_OBST_Y = 41;
+N_OBST_Z = 17;
 
-N_DOM_X_LEFT  = 45;  // from the obstacle towards left  (towards xmin)
-N_DOM_X_RIGHT = 91;  // from the obstacle towards right (towards xmax)
-N_DOM_Y_LEFT  = 61;  // spanwise resolution on the left (at xmin)
+N_DOM_X_LEFT  = 51;  // from the obstacle towards left (towards xmin)
+N_DOM_X_RIGHT = 121;  // from the obstacle towards left (towards xmax)
+N_DOM_Y_LEFT  = 41;  // spanwise resolution on the left (at xmin)
 N_DOM_Y_RIGHT = 21;  // spanwise resolution on the right (at xmax)
+N_BUF_Y       =  4;
 
-// The two resolutions which follow are in cells
-N_BUF_Y        =   4;
-N_ABOVE_OBST_Z = 108;
+N_ABOVE_OBST_Z = 134;
 
 TINY = 1.0e-9;
 HUGE = 1.0e+9;
@@ -68,10 +67,10 @@ Transfinite Curve {7, 9}  = N_OBST_X Using Progression 1;
 Transfinite Curve {8, 10} = N_OBST_Y Using Progression 1;
 
 // On the boundary, from the obstacle center towards the beginning
-Transfinite Curve {1, 2}  = N_DOM_X_LEFT Using Progression 1;
+Transfinite Curve {1, 2}  = N_DOM_X_LEFT Using Progression 1.01;
 
 // On the boundary, from the obstacle towards the right
-Transfinite Curve {3, 4}  = N_DOM_X_RIGHT Using Progression 1.012;
+Transfinite Curve {3, 4}  = N_DOM_X_RIGHT Using Progression 1.01;
 
 // Along the width of the domain, left side
 Transfinite Curve {5}  = N_DOM_Y_LEFT Using Progression 1;
