@@ -195,6 +195,8 @@
     include 'Control_Mod/Numerics/Distance_Function_Time_Integration_Scheme_Vof.f90'
     include 'Control_Mod/Numerics/Factor_Number_Cells_Distance_Function_Vof.f90'
     include 'Control_Mod/Numerics/Factor_Fictitious_Time_Vof.f90'
+    include 'Control_Mod/Numerics/Heaviside_Mollified_Factor.f90'
+    include 'Control_Mod/Numerics/Least_Squares_Curvature.f90'
     include 'Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90'
     include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90'
     include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90'
