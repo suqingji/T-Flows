@@ -829,7 +829,7 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Swarm_Mod/Print_Statistics.f90
 #-- ./Swarm_Mod/Sgs_Discrete_Random_Walk.f90
 #-- ./Swarm_Mod/Bounce_Particle.f90
-#-- ./Swarm_Mod/Grad_Modeled_Flow.f90
+#-- ./Swarm_Mod/Flow_Gradients.f90
 #-- ./Swarm_Mod/Particle_Forces.f90
 #-- ./Swarm_Mod/Exchange_Particles.f90
 #-- ./Swarm_Mod/Move_Trapped.f90
