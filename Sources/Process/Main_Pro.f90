@@ -422,7 +422,7 @@
     !   Save the results   !
     !----------------------!
     call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
-                                Flow, turb, Vof, Swarm, exit_now)
+                                Flow, turb, Vof, Swarm, prsi, exit_now)
 
     ! Ran more than a set wall clock time limit
     if(Info_Mod_Time_To_Exit() .or. exit_now) then
