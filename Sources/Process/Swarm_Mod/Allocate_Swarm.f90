@@ -83,4 +83,9 @@
   allocate(Swarm % v2_mod_y(-nb:nc));  Swarm % v2_mod_y(:) = 0.
   allocate(Swarm % v2_mod_z(-nb:nc));  Swarm % v2_mod_z(:) = 0.
 
+  ! Allocate variables for temperature gradients 
+  allocate(swarm % t_x  (-nb:nc));  swarm % t_x(:)   = 0.
+  allocate(swarm % t_y  (-nb:nc));  swarm % t_y(:)   = 0.
+  allocate(swarm % t_z  (-nb:nc));  swarm % t_z(:)   = 0.
+
   end subroutine
