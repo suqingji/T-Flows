@@ -11,7 +11,7 @@
   type(Field_Type),    pointer :: Flow
   type(Grid_Type),     pointer :: Grid
   type(Turb_Type),     pointer :: turb
-  type(Var_Type),      pointer :: u, v, w, kin, eps, zeta, f22
+  type(Var_Type),      pointer :: u, v, w, t, kin, eps, zeta, f22
   type(Particle_Type), pointer :: Part
   real,                pointer :: fb_x, fb_y, fb_z
   integer                      :: c, c2, n          ! nearest cell and node
@@ -25,10 +25,13 @@
   real                         :: gravity           ! gravity magnitude
   real                         :: visc_fluid        ! characteristic viscosity
   real                         :: dens_fluid        ! characteristic density
+  real                         :: cond_fluid        ! characteristic conductivity
   real                         :: f_fx, f_fy, f_fz  ! Brownian force components
   real                         :: fd_p              ! particle damping funct.
   real                         :: v2_mod_xc, v2_mod_yc, v2_mod_zc
   real                         :: u_mod, v_mod, w_mod
+  real                         :: mp, Ct, Cm, Cs, kn, temp, kf, kp, lambda, d_t
+  real                         :: fth_x, fth_y, fth_z
 !==============================================================================!
 
   ! Take aliases for Flow
@@ -188,9 +191,47 @@
   !----------------------------!
   !   Compute buoyancy force   !
   !----------------------------!
-  fb_x = (1.0 - dens_fluid / Part % density) * grav_x
-  fb_y = (1.0 - dens_fluid / Part % density) * grav_y
-  fb_z = (1.0 - dens_fluid / Part % density) * grav_z
+  if(swarm % gravity) then
+    fb_x = (1.0 - dens_fluid / part % density) * grav_x
+    fb_y = (1.0 - dens_fluid / part % density) * grav_y
+    fb_z = (1.0 - dens_fluid / part % density) * grav_z
+  else
+    fb_x = 0.0
+    fb_y = 0.0
+    fb_z = 0.0
+  end if
+
+  !----------------------------------!
+  !   Compute thermophoretic force   !
+  !----------------------------------!
+  if(swarm % thermophoresis) then
+    mp      = (4.0/3.0) * PI * part % density * (0.5*part % d)**3 ! particle mass
+    Ct      = 2.18                     ! dimensionless constant for Talbot model        
+    Cs      = 1.17                     ! dimensionless constant for Talbot model 
+    Cm      = 1.14                     ! dimensionless constant for Talbot model
+    kf      = cond_fluid               ! fluid thermal conductivity 
+    kp      = swarm % therm_cond       ! particle thermal conductivity 
+    lambda  = 66.0E-9                  ! fluid mean free path (typical value for 101kpa and 293 K)
+    kn      = 2.0 * lambda / part % d  ! Knudsen number definition by ANSYS manual 
+    D_t     = (6 * PI * part % d * visc_fluid**2 * Cs *(kf/kp + Ct*kn)) / &
+              (dens_fluid * (1.0 + 3.0 *Cm*kn) * (1.0 + 2.0*kf/kp + 2.0*Ct*kn))
+
+    ! Compute local temperature (temperature at particle location)
+    temp    = t % n(c)       &
+            + t % x(c) * rx  &
+            + t % y(c) * ry  &
+            + t % z(c) * rz
+
+    ! Thermophoretic force components
+    fth_x   = - (D_t / (mp * temp)) * swarm % t_x(c)
+    fth_y   = - (D_t / (mp * temp)) * swarm % t_y(c)
+    fth_z   = - (D_t / (mp * temp)) * swarm % t_z(c)
+
+  else ! Thermophoresis is switched off
+    fth_x = 0.0
+    fth_y = 0.0
+    fth_z = 0.0
+  end if
 
   !------------------------!
   !   Fukagata SGS model   !
