@@ -38,6 +38,9 @@
     ! Swarm mean relaxation time
     real :: tau
 
+    ! Swarm thermal conductivity 
+    real :: therm_cond
+
     ! Coefficient of restitution (1.0 - elastic, 0.0 - sticky)
     real :: rst
 
@@ -73,12 +76,20 @@
     ! (for SGS of Hybrid_Les_Rans model)
     real, allocatable :: v2_mod(:), v2_mod_x(:), v2_mod_y(:), v2_mod_z(:)
 
+    ! Fluid temperature gradients (for interpolation to particle location)
+    real, allocatable :: t_x(:), t_y(:), t_z(:)
+
     ! SGS Brownian diffusion force
     real, allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
 
     ! Variable holding the subgrid scale (SGS)  model type
     ! (Must be part of type definition for multiple materials)
     integer :: subgrid_scale_model
+
+    ! Forces acting on swarm
+    logical :: gravity
+    logical :: thermophoresis
+    !logical :: brownian_diffusion ! should be done later
 
     integer, allocatable :: i_work(:)
     logical, allocatable :: l_work(:)
@@ -118,7 +129,7 @@
   include 'Swarm_Mod/Calculate_Mean.f90'
   include 'Swarm_Mod/Check_Periodicity.f90'
   include 'Swarm_Mod/Exchange_Particles.f90'
-  include 'Swarm_Mod/Grad_Modeled_Flow.f90'
+  include 'Swarm_Mod/Flow_Gradients.f90'
   include 'Swarm_Mod/Move_Particle.f90'
   include 'Swarm_Mod/Move_Trapped.f90'
   include 'Swarm_Mod/Particle_Forces.f90'
