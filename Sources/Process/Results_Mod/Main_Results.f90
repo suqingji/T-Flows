@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Main_Results(Results,                           &
                           curr_dt, last_dt, time, n_dom,     &
-                          Flow, turb, Vof, swarm, exit_now)
+                          Flow, turb, Vof, swarm, prsi, exit_now)
 !------------------------------------------------------------------------------!
 !   Main function for saving results (postprocessing and backup)               !
 !------------------------------------------------------------------------------!
@@ -16,6 +16,7 @@
   type(Turb_Type)     :: turb(MD)        ! turbulence modelling
   type(Vof_Type)      :: Vof(MD)         ! multiphase modelling with vof
   type(Swarm_Type)    :: swarm(MD)       ! swarm of particles
+  integer             :: prsi            ! swarm save interval
   logical             :: exit_now
 !----------------------------------[Locals]------------------------------------!
   integer :: d         ! domain counter
@@ -51,7 +52,7 @@
                                   curr_dt, plot_inside=.true., domain=d)
       call Results % Save_Results(Flow(d), turb(d), Vof(d), swarm(d),  &
                                   curr_dt, plot_inside=.false., domain=d)
-      call Results % Save_Swarm(swarm(d), curr_dt)
+      !call Results % Save_Swarm(swarm(d), curr_dt)
 
       if(Flow(d) % with_interface) then
         if(Vof(d) % track_front) then
@@ -64,9 +65,19 @@
 
       ! Write results in user-customized format
       call User_Mod_Save_Results(Flow(d), turb(d), Vof(d), swarm(d), curr_dt)
-      call User_Mod_Save_Swarm(Flow(d), turb(d), Vof(d), swarm(d), curr_dt)
+      !call User_Mod_Save_Swarm(Flow(d), turb(d), Vof(d), swarm(d), curr_dt)
 
     end do  ! through domains
+  end if
+
+  ! Save swarm vtk files independently from fluid flow
+  if(curr_dt .ge. prsi) then
+    if(mod(curr_dt, prsi) .eq. 0) then
+      do d = 1, n_dom
+        call Results % Save_Swarm(swarm(d), curr_dt)
+        call User_Mod_Save_Swarm(Flow(d), turb(d), Vof(d), swarm(d), curr_dt)
+      end do
+    end if
   end if
 
   if(save_now) then
