@@ -40,14 +40,12 @@
   end if
 
   if(turb % model .eq. HYBRID_LES_RANS) then
-
     ! Correcting for particle time step size (if ER-HRL model is used)
     call Swarm_Mod_Particle_Time_Scale(Swarm)
+  end if
 
     ! Store gradients for modeled flow quantities for Swarm
-    call Swarm_Mod_Grad_Modeled_Flow(Swarm, k)
-
-  end if
+    call Swarm_Mod_Flow_Gradients(Swarm, k)
 
   ! Gaussian random no.s interval (for SEIM model)
   Swarm % time_eim = n - first_dt_p
