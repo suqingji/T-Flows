@@ -22,7 +22,7 @@
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(SL)            :: name
-  integer                  :: n_times, n_stat, n_stat_p
+  integer                  :: n_times, n_stat, n_stat_p, ss_int
 !==============================================================================!
 
   ! Take aliases
@@ -277,6 +277,8 @@
 
     call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
                                    HUGE_INT, n_stat_p, .false.)
+    call Control_Mod_Read_Int_Item('SWARM_SAVE_INTERVAL',                      &
+                                   HUGE_INT, ss_int, .false.)
 
     ! SGS models for particle
     call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)
@@ -286,6 +288,21 @@
       case('DISCRETE_RANDOM_WALK')
            swarm % subgrid_scale_model = DISCRETE_RANDOM_WALK
     end select
+
+  !---------------------------!
+  ! Forces acting on particle ! 
+  !---------------------------!
+  if(Flow % heat_transfer) then
+    call Control_Mod_Swarm_Thermophoresis(swarm % thermophoresis,   &
+                                          verbose = .true.)
+ 
+    ! Particle thermal conductivity (to compute thermophoretic coefficient)
+    call Control_Mod_Swarm_Thermal_conductivity(swarm % therm_cond, &
+                                                verbose = .true.)
+  end if
+ 
+  call Control_Mod_Swarm_Gravity(swarm % gravity, verbose = .true.)
+
 
     if(n_times > n_stat_p) then  ! last line covers unsteady RANS models
       if(this_proc < 2) then
