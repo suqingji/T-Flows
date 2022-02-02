@@ -65,7 +65,7 @@
     real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
     real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
 
-    ! Mean passive scalars and scalar trubulent fluxes
+    ! Mean passive scalars and scalar turbulent fluxes
     real, allocatable :: scalar_mean(:,:)
     real, allocatable :: uc(:), vc(:), wc(:)
 
@@ -119,7 +119,7 @@
     ! For LES you need to know nearest wall cell
     integer, allocatable :: nearest_wall_cell(:)
 
-    ! id of different zones for roughness interpolation
+    ! I.D. of different zones for roughness interpolation
     real, allocatable :: id_zone(:)
 
     ! Variable holding the turbulence model; its variant and statistics
