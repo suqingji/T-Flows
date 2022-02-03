@@ -49,6 +49,10 @@
   fb_y => Part  % fb_y
   fb_z => Part  % fb_z
 
+  ! Reading particle diameter from control file (to avoid old values stored in
+  ! the backup file).
+  part % d = swarm % diameter
+
   ! Take aliases for closest node, vell and boundary cell
   n  = Part % node      ! index of the closest node for cfl calculation
   c  = Part % cell      ! index of the closest cell for interpolation
