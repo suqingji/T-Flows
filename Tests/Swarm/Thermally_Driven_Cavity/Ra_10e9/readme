@@ -1,0 +1,16 @@
+- The following values for fluid properties are assigned to achieve Ra=10e9:
+
+--> Rho     = 1.225 
+--> g       = 0.022353 (so Beta can be 1.0)
+--> Lambda  = 0.000037425576
+--> Delta_T = 39 
+--> mu      = 1.789e-5 
+--> Cp      = 1.0 specific heat (heat capacity)
+--> Beta    = 1.0 (Volume expansion coefficient) - Thermal Exp. Coeff.
+
+alpha = lambda / (rho * Cp)
+nu    = mu / rho 
+L     == Characteristic length (height of the cavity here = 0.7) 
+Ra    = g* Beta / (nu * alpha) * Delta_T * L^3
+
+
