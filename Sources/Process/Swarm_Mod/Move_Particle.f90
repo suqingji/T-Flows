@@ -250,7 +250,7 @@
   !-------------------------!
   !   Updating x-velocity   !
   !-------------------------!
-  k1 = (Part % f * (up -  Part % u) / Part % tau) + fb_x + f_fx
+  k1 = (Part % f * (up -  Part % u) / Part % tau) + fb_x + f_fx + fth_x
   k2 = (Part % f * (up - (Part % u + (k1*Swarm % dt)*0.5)) / Part % tau)
   k3 = (Part % f * (up - (Part % u + (k2*Swarm % dt)*0.5)) / Part % tau)
   k4 = (Part % f * (up - (Part % u +  k3*Swarm % dt))      / Part % tau)
@@ -261,7 +261,7 @@
   !-------------------------!
   !   Updating y-velocity   !
   !-------------------------!
-  k1 = (Part % f * (vp -  Part % v) / Part % tau) + fb_y + f_fy
+  k1 = (Part % f * (vp -  Part % v) / Part % tau) + fb_y + f_fy + fth_y
   k2 = (Part % f * (vp - (Part % v + (k1*Swarm % dt)*0.5)) / Part % tau)
   k3 = (Part % f * (vp - (Part % v + (k2*Swarm % dt)*0.5)) / Part % tau)
   k4 = (Part % f * (vp - (Part % v +  k3*Swarm % dt))      / Part % tau)
@@ -272,7 +272,7 @@
   !-------------------------!
   !   Updating z-velocity   !
   !-------------------------!
-  k1 = (Part % f * (wp -  Part % w) / Part % tau) + fb_z + f_fz
+  k1 = (Part % f * (wp -  Part % w) / Part % tau) + fb_z + f_fz + fth_z
   k2 = (Part % f * (wp - (Part % w + (k1*Swarm % dt)*0.5)) / Part % tau)
   k3 = (Part % f * (wp - (Part % w + (k2*Swarm % dt)*0.5)) / Part % tau)
   k4 = (Part % f * (wp - (Part % w +  k3*Swarm % dt))      / Part % tau)
