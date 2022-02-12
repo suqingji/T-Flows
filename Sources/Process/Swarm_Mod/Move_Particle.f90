@@ -61,6 +61,7 @@
   ! Characteristic viscosity and density (needs to be discussed yet)
   visc_fluid = Flow % viscosity(c)
   dens_fluid = Flow % density(c)
+  cond_fluid = Flow % conductivity(c)
 
   ! Store fluid density for saving
   Part % dens_fluid = dens_fluid
@@ -221,10 +222,10 @@
               (dens_fluid * (1.0 + 3.0 *Cm*kn) * (1.0 + 2.0*kf/kp + 2.0*Ct*kn))
 
     ! Compute local temperature (temperature at particle location)
-    temp    = t % n(c)       &
-            + t % x(c) * rx  &
-            + t % y(c) * ry  &
-            + t % z(c) * rz
+    temp    = swarm % t(c)         &
+            + swarm % t_x(c) * rx  &
+            + swarm % t_y(c) * ry  &
+            + swarm % t_z(c) * rz
 
     ! Thermophoretic force components
     fth_x   = - (D_t / (mp * temp)) * swarm % t_x(c)
