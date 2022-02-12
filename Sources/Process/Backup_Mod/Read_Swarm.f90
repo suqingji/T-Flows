@@ -25,14 +25,15 @@
   !--------------------------!
 
   ! Number of particles
-  call Backup_Mod_Read_Int(Comm, fh, disp, vc, 'n_particles', n_part)
+  ! call Backup_Mod_Read_Int(Comm, fh, disp, vc, 'n_particles', n_part)
+  ! (It's actually better to always read n_p rather from the control file...)
 
   swr % i_work(:) = 0
   swr % l_work(:) = .false.
   swr % r_work(:) = 0.0
 
   if(n_part > 0) then
-    swr % n_particles = n_part
+    !swr % n_particles = n_part
     call Backup_Mod_Read_Int_Array(Comm, fh, disp, vc,   &
                    'particle_int_data',                  &
                     swr % i_work(1 : swr % N_I_VARS*swr % n_particles))
