@@ -41,18 +41,22 @@
     call Flow % Grad_Component(swarm % v2_mod, 3, swarm % v2_mod_z)
   end if
 
-  ! Temperature gradients for calculating "thermophoresis"
+  ! Temperature gradients for calculating thermophoresis
   if(flow % heat_transfer) then
   
    ! Temperature gradients 
     call Flow % Grad_Variable(t)
  
-    ! Storing temperature gradients (for interp. in Move_Particle.f90)
+    ! Array for t
     do c = -grid % n_bnd_cells, grid % n_cells
-      swarm % t_x(c) = t % x(c)
-      swarm % t_y(c) = t % y(c)
-      swarm % t_z(c) = t % z(c)
+      swarm % t(c) = t % n(c)
     end do
+
+    ! Storing the gradients of temperature in Work_Mod arrays
+    ! (dt/dx, dt/dy, dt/dz)
+    call Flow % Grad_Component(swarm % t, 1, swarm % t_x)
+    call Flow % Grad_Component(swarm % t, 2, swarm % t_y)
+    call Flow % Grad_Component(swarm % t, 3, swarm % t_z)
   end if
 
   end subroutine
