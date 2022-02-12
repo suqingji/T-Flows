@@ -77,7 +77,7 @@
     real, allocatable :: v2_mod(:), v2_mod_x(:), v2_mod_y(:), v2_mod_z(:)
 
     ! Fluid temperature gradients (for interpolation to particle location)
-    real, allocatable :: t_x(:), t_y(:), t_z(:)
+    real, allocatable :: t(:), t_x(:), t_y(:), t_z(:)
 
     ! SGS Brownian diffusion force
     real, allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
