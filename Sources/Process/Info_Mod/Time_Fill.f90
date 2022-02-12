@@ -20,7 +20,7 @@
 
     ! Write time step number
     write(time_info % lines(2)(55:65), '(a11)')    'Time step :'
-    write(time_info % lines(2)(67:72),  '(i6)')    n
+    write(time_info % lines(2)(67:74),  '(i8)')    n
 
     ! Write simulation time
     write(time_info % lines(4)(45:61),    '(a17)')  'Simulation time :'
