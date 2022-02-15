@@ -4,16 +4,17 @@
  PROBLEM_NAME              cavity
  HEAT_TRANSFER             yes 
  BUOYANCY                  thermal density
- TIME_STEP                 0.00001
-# TIME_STEP                0.01        ! Primary flow time step
+ TIME_STEP                 0.00003
+ #TIME_STEP                 0.01
 
- NUMBER_OF_TIME_STEPS                        9500000
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    300010
- RESULTS_SAVE_INTERVAL                       1000000
- SWARM_SAVE_INTERVAL                         1000000
- BACKUP_SAVE_INTERVAL                        2000000
+ #NUMBER_OF_TIME_STEPS                        9900000
+ NUMBER_OF_TIME_STEPS                        170000
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    150010
+ RESULTS_SAVE_INTERVAL                       100000
+ SWARM_SAVE_INTERVAL                         100000
+ BACKUP_SAVE_INTERVAL                        200000
  STARTING_TIME_STEP_FOR_TURB_STATISTICS      75000
- #LOAD_BACKUP_NAME                            cavity-ts300000.backup
+ LOAD_BACKUP_NAME                            cavity-ts150000.backup
 
 #-------------------
 # Monitoring points 
@@ -27,7 +28,7 @@
 # Physical models
 #-----------------
 
- GRAVITATIONAL_VECTOR   0.0  0.0  -0.022353
+ GRAVITATIONAL_VECTOR   0.0  0.0  -0.0313
 
  # Properties based on Pr and Ra numbers:
  # Pr = 0.71
@@ -35,10 +36,10 @@
  
 # TURBULENT_PRANDTL_NUMBER  0.71  
  
- MASS_DENSITY                   1.225
+ MASS_DENSITY                   1.0
  HEAT_CAPACITY                  1.0
- DYNAMIC_VISCOSITY              1.789e-5
- THERMAL_CONDUCTIVITY           3.0867e-5
+ DYNAMIC_VISCOSITY              1.728e-5
+ THERMAL_CONDUCTIVITY           2.434e-5
  VOLUME_EXPANSION_COEFFICIENT   1.0
 
  TURBULENCE_MODEL               LES_DYNAMIC
@@ -49,13 +50,13 @@
  MULTIPHASE_MODEL                              lagrangian_particles
  PARTICLE_TRACKING                             yes
 # SWARM_SUBGRID_SCALE_MODEL                    brownian_fukagata
- SWARM_DIAMETER                                1.0E-06     
+ SWARM_DIAMETER                                3.54E-06
  SWARM_DENSITY                                 2000.0
  NUMBER_OF_SWARM_SUB_STEPS                     1
- NUMBER_OF_PARTICLES                           50000
+ NUMBER_OF_PARTICLES                           1
  SWARM_COEFFICIENT_OF_RESTITUTION              0.0 
  SWARM_THERMAL_CONDUCTIVITY                    1.38
- THERMOPHORESIS                                no
+ THERMOPHORESIS                                no 
  SWARM_GRAVITY                                 yes
 
 #----------------------
@@ -88,9 +89,9 @@
  TOLERANCE_FOR_SIMPLE_ALGORITHM       1.e-4
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER   520
 
- REFERENCE_TEMPERATURE                   330.54
- REFERENCE_DENSITY                       1.225
- TURBULENT_HEAT_FLUX_MODEL               SGDH
+ REFERENCE_TEMPERATURE                   39.18
+ REFERENCE_DENSITY                       1.0
+ #TURBULENT_HEAT_FLUX_MODEL               SGDH
  #TURBULENT_HEAT_FLUX_MODEL              afm
 .
 #--------------------
@@ -98,7 +99,7 @@
 #--------------------
   INITIAL_CONDITION
     VARIABLES           u     v     w     t        kin    eps     zeta   f22   t2
-    VALUES              0.0   0.0   0.0   310.71   0.005  0.001   0.1    0.1   0.5
+    VALUES              0.0   0.0   0.0   19.35    0.005  0.001   0.1    0.1   0.5
 
 #---------------------
 # Boundary conditions
@@ -112,20 +113,20 @@
     TYPE                wall
     VARIABLES           x     u     v     w     t
 #    VARIABLES           x     t
-    FILE                bottom.dat   
+    FILE                bottom_C.dat   
 
   BOUNDARY_CONDITION    top_wall
     TYPE                wall
     VARIABLES           x     u     v     w     t
 #    VARIABLES           x     t
-    FILE                top.dat   
+    FILE                top_C.dat   
 
   BOUNDARY_CONDITION    hot_wall
     TYPE                wall
     VARIABLES           u     v     w     t
-    VALUES              0.0   0.0   0.0   330.54
+    VALUES              0.0   0.0   0.0   57.39
 
   BOUNDARY_CONDITION    cold_wall
     TYPE                wall
     VARIABLES           u     v     w     t
-    VALUES              0.0   0.0   0.0   291.36
+    VALUES              0.0   0.0   0.0   18.21
