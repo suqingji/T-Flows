@@ -19,15 +19,18 @@
   real                         :: rx, ry, rz        ! paticle-cell vector
   real                         :: dx, dy, dz        ! cell dimensions estimate
   real                         :: up, vp, wp        ! velocity at particle
-  real                         :: flow_vel          ! Flow vel. magnitude
+  real                         :: flow_vel          ! flow vel. magnitude
   real                         :: k1, k2, k3, k4    ! Runge-Kutta increments
   real                         :: part_vel          ! relative velocity 
   real                         :: gravity           ! gravity magnitude
+  real                         :: tau_f             ! fluid time scale
   real                         :: visc_fluid        ! characteristic viscosity
   real                         :: dens_fluid        ! characteristic density
   real                         :: cond_fluid        ! characteristic conductivity
   real                         :: f_fx, f_fy, f_fz  ! Brownian force components
+  real                         :: fd_x, fd_y, fd_z  ! Drag force components 
   real                         :: fd_p              ! particle damping funct.
+  real                         :: f_d, f_th         ! total drag & therm. forces
   real                         :: v2_mod_xc, v2_mod_yc, v2_mod_zc
   real                         :: u_mod, v_mod, w_mod
   real                         :: mp, Ct, Cm, Cs, kn, temp, kf, kp, lambda, d_t
@@ -237,6 +240,9 @@
     fth_y = 0.0
     fth_z = 0.0
   end if
+ 
+  ! Total thermophoretic force acting on the particle
+  f_th = sqrt(fth_x**2 + fth_y**2 + fth_z**2)
 
   !------------------------!
   !   Fukagata SGS model   !
@@ -251,10 +257,11 @@
   !-------------------------!
   !   Updating x-velocity   !
   !-------------------------!
-  k1 = (Part % f * (up -  Part % u) / Part % tau) + fb_x + f_fx + fth_x
-  k2 = (Part % f * (up - (Part % u + (k1*Swarm % dt)*0.5)) / Part % tau)
-  k3 = (Part % f * (up - (Part % u + (k2*Swarm % dt)*0.5)) / Part % tau)
-  k4 = (Part % f * (up - (Part % u +  k3*Swarm % dt))      / Part % tau)
+  k1   = (Part % f * (up -  Part % u) / Part % tau) + fb_x + f_fx + fth_x
+  k2   = (Part % f * (up - (Part % u + (k1*Swarm % dt)*0.5)) / Part % tau)
+  k3   = (Part % f * (up - (Part % u + (k2*Swarm % dt)*0.5)) / Part % tau)
+  k4   = (Part % f * (up - (Part % u +  k3*Swarm % dt))      / Part % tau)
+  fd_x = k1 - (fb_x + f_fx + fth_x)
 
   ! X-velocity calculation
   Part % u = Part % u + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*Swarm % dt
@@ -262,10 +269,11 @@
   !-------------------------!
   !   Updating y-velocity   !
   !-------------------------!
-  k1 = (Part % f * (vp -  Part % v) / Part % tau) + fb_y + f_fy + fth_y
-  k2 = (Part % f * (vp - (Part % v + (k1*Swarm % dt)*0.5)) / Part % tau)
-  k3 = (Part % f * (vp - (Part % v + (k2*Swarm % dt)*0.5)) / Part % tau)
-  k4 = (Part % f * (vp - (Part % v +  k3*Swarm % dt))      / Part % tau)
+  k1   = (Part % f * (vp -  Part % v) / Part % tau) + fb_y + f_fy + fth_y
+  k2   = (Part % f * (vp - (Part % v + (k1*Swarm % dt)*0.5)) / Part % tau)
+  k3   = (Part % f * (vp - (Part % v + (k2*Swarm % dt)*0.5)) / Part % tau)
+  k4   = (Part % f * (vp - (Part % v +  k3*Swarm % dt))      / Part % tau)
+  fd_y = k1 - (fb_y + f_fy + fth_y)
 
   ! Y-velocity calculation
   Part % v = Part % v + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*Swarm % dt
@@ -273,13 +281,17 @@
   !-------------------------!
   !   Updating z-velocity   !
   !-------------------------!
-  k1 = (Part % f * (wp -  Part % w) / Part % tau) + fb_z + f_fz + fth_z
-  k2 = (Part % f * (wp - (Part % w + (k1*Swarm % dt)*0.5)) / Part % tau)
-  k3 = (Part % f * (wp - (Part % w + (k2*Swarm % dt)*0.5)) / Part % tau)
-  k4 = (Part % f * (wp - (Part % w +  k3*Swarm % dt))      / Part % tau)
+  k1   = (Part % f * (wp -  Part % w) / Part % tau) + fb_z + f_fz + fth_z
+  k2   = (Part % f * (wp - (Part % w + (k1*Swarm % dt)*0.5)) / Part % tau)
+  k3   = (Part % f * (wp - (Part % w + (k2*Swarm % dt)*0.5)) / Part % tau)
+  k4   = (Part % f * (wp - (Part % w +  k3*Swarm % dt))      / Part % tau)
+  fd_z = k1 - (fb_z + f_fz + fth_z)
 
   ! Z-velocity calculation
   Part % w = Part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*Swarm % dt
+
+  ! Total drag force acting on the particle 
+  f_d  = sqrt(fd_x**2 + fd_y**2 + fd_z**2)
 
   !------------------------------------------------------------------!
   !   Compute the new position of particle with 1st order explicit   !
@@ -303,11 +315,12 @@
                    abs(Part % v * Swarm % dt) / dy,  &
                    abs(Part % w * Swarm % dt) / dz)
 
-  ! Particle stokes number
-  ! St = tau_p/tau_f || tau_p = (rho_P*d_p^2)/18 mu || tau_f = nu/u_tau^2
-  ! Should be done in a generic way by calling the friction velocity here...
-  ! ... the used value used here is case_specific (Re_tau=590).
-  Part % st = Swarm % density * (0.017046**2)       &
-            * (Part % d)**2 / 18.0 / visc_fluid**2
+  ! Particle stokes number [case specific]
+  ! St = tau_p/tau_f 
+  ! For laminar flow: tau_f = L / U
+  ! For laminar flow: tau_f = nu / (u_tau**2)
+  tau_f = 0.615 ! DHC case with Ra = 10E9
+  Part % st = Part % tau / tau_f
+  ! It's better to read the fluid timescale category in the control file later!    
 
   end subroutine
