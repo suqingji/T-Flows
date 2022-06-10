@@ -12,8 +12,8 @@
   type(Turb_Type), target :: turb
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
-  real :: U_Plus_Rough_Walls
-  real :: Y_Plus_Rough_Walls
+  real :: Y_Plus
+  real :: U_Plus_Log_Law 
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -22,7 +22,7 @@
   real                      :: nx, ny, nz
   real                      :: cs, lf, u_tau_l, u_f, nc2
   real                      :: u_tan, a_pow, b_pow, nu, dely
-  real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o
+  real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !==============================================================================!
 
   ! Take aliases
@@ -121,6 +121,15 @@
 
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+     
+        kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
+
+        ! Set up roughness coefficient
+        z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+        if(turb % rough_walls) then
+          z_o = max(Grid % wall_dist(c1)  &
+              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
+        end if
 
         u_tan = Flow % U_Tan(s)
 
@@ -132,26 +141,19 @@
         ! Calculate u_tau_l
         u_tau_l = ( u_tan/a_pow * (nu/dely)**b_pow ) ** (1.0/(1.0+b_pow))
 
-        ! Calculate tau_wall (but it is never used)
-        turb % tau_wall(c1) = Flow % viscosity(c1) * u_tan / dely
-
         ! Calculate y+
-        turb % y_plus(c1)  = dely * u_tau_l / nu
+        turb % y_plus(c1) = Y_Plus(turb,                 &
+                                   u_tau_l,              &
+                                   Grid % wall_dist(c1), &
+                                   kin_vis,              &
+                                   z_o)
+
+        u_plus = U_Plus_Log_Law(turb,                 &
+                               Grid % wall_dist(c1),  &   
+                               turb % y_plus(c1),     &   
+                               z_o)
 
         if(turb % y_plus(c1)  >=  11.81) then
-
-          if(turb % rough_walls) then
-            z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-            z_o = max(Grid % wall_dist(c1)   &
-                / (e_log * max(turb % y_plus(c1),1.0)), z_o)
-
-            turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                                   u_tau_l,               &
-                                                   Grid % wall_dist(c1),  &
-                                                   nu)
-            u_plus     = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
-          end if
-
 
           ! This one is effective viscosity
           turb % vis_w(c1) = Flow % density(c1) * u_tau_l * u_tau_l * dely  &
@@ -163,8 +165,6 @@
         end if
 
         if(Flow % heat_transfer) then
-          u_plus = u_tan / u_tau_l
-
 
           pr_t = Turb_Mod_Prandtl_Number(turb, c1)
           pr   = Flow % Prandtl_Number(c1)          ! laminar Prandtl number
@@ -174,10 +174,8 @@
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
-
           if(turb % rough_walls) then
             beta = 0.0
-            u_plus = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
           end if
 
           ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr)
@@ -198,10 +196,8 @@
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
-
           if(turb % rough_walls) then
             beta = 0.0
-            u_plus = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
           end if
 
           ebf = 0.01 * (sc * turb % y_plus(c1)**4                 &
