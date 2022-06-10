@@ -20,11 +20,9 @@
   type(Turb_Type), target :: turb
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
-  real :: Tau_Wall_Low_Re
+  real :: Tau_Wall_Log_Law
   real :: U_Plus_Log_Law
-  real :: U_Plus_Rough_Walls
-  real :: Y_Plus_Low_Re
-  real :: Y_Plus_Rough_Walls
+  real :: Y_Plus
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -84,45 +82,53 @@
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
+        kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
+
+        ! Set up roughness coefficient
+        z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+        if(turb % rough_walls) then
+          z_o = max(Grid % wall_dist(c1)  &
+              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
+        end if
+
+        ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau,                 &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
 
-        turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                              Flow % density(c1), &
-                                              u_tau,              &
-                                              u_tan,              &
-                                              turb % y_plus(c1))
+        turb % y_plus(c1) = Y_Plus(turb,                 &
+                                   u_tau,                &
+                                   Grid % wall_dist(c1), &
+                                   kin_vis,              &
+                                   z_o)
 
-        ebf = Turb_Mod_Ebf_Momentum(turb, c1)
+        turb % tau_wall(c1) = Tau_Wall_Log_Law(turb,                &
+                                              Flow % density(c1),   &   
+                                              u_tau,                &
+                                              u_tan,                &
+                                              Grid % wall_dist(c1), &
+                                              turb % y_plus(c1),    &   
+                                              z_o)
 
-        u_plus = U_Plus_Log_Law(turb, turb % y_plus(c1))
+        ebf = Turb_Mod_Ebf_Momentum(turb, c1) 
+
+        u_plus = U_Plus_Log_Law(turb,                 &
+                               Grid % wall_dist(c1),  &   
+                               turb % y_plus(c1),     &   
+                               z_o)
 
         if(turb % y_plus(c1) < 3.0) then
           turb % vis_w(c1) = turb % vis_t(c1) + Flow % viscosity(c1)
         else
+
+          if(turb % y_plus(c1) < 11.3 ) then
+            ebf = 0.00001
+          end if
+
           turb % vis_w(c1) =    turb % y_plus(c1) * Flow % viscosity(c1)  &
-                           / (  turb % y_plus(c1) * exp(-1.0 * ebf)      &
+                           / (  turb % y_plus(c1) * exp(-1.0 * ebf)       &
                               + u_plus * exp(-1.0/ebf) + TINY)
-        end if
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau,                 &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
-
-        if(turb % rough_walls) then
-          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                                 u_tau,                 &
-                                                 Grid % wall_dist(c1),  &
-                                                 kin_vis)
-          u_plus     = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
-          turb % vis_w(c1) = turb % y_plus(c1) * Flow % viscosity(c1) / u_plus
         end if
 
         if(Flow % heat_transfer) then
