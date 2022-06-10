@@ -8,7 +8,8 @@
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: Sol
 !---------------------------------[Calling]------------------------------------!
-  real :: Y_Plus_Low_Re
+  real :: Roughness_Coefficient
+  real :: Y_Plus
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -18,7 +19,7 @@
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: kin_vis, p_t2_wall, ebf, u_tau
-  real                       :: ut_sgdh, vt_sgdh, wt_sgdh
+  real                       :: ut_sgdh, vt_sgdh, wt_sgdh, z_o
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -91,13 +92,23 @@
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or. &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
+        ! Set up roughness coefficient 
+        z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+        if(turb % rough_walls) then
+          z_o = max(Grid % wall_dist(c1)   &
+              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
+        end if
+
         ! Kinematic viscosities
         kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,      &
-                     Grid % wall_dist(c1), kin_vis)
+        turb % y_plus(c1) = Y_Plus(turb,                 &
+                                   u_tau,                &
+                                   Grid % wall_dist(c1), &
+                                   kin_vis,              &
+                                   z_o)
 
         ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
