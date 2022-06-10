@@ -24,6 +24,9 @@
   c_mu_theta5  =  0.35
   kappa_theta  =  0.38         ! von Karman constant for temperature
 
+  ! Roughness coefficient
+  turb % z_o = 0.0
+
   ! Constants for GGDH turbulent flux
   c_theta =  0.2
 
