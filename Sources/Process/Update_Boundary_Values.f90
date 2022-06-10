@@ -27,7 +27,7 @@
   type(Vof_Type),   target :: Vof
   character(*)             :: update
 !---------------------------------[Calling]------------------------------------!
-  real :: Y_Plus_Low_Re
+  real :: Y_Plus
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
@@ -159,9 +159,9 @@
             kin_vis = Flow % viscosity(c1) / Flow % density(c1)
             u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
                   / Grid % wall_dist(c1)
-            turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,           &
-                                              Grid % wall_dist(c1),  &
-                                              kin_vis)
+            turb % y_plus(c1) = Y_Plus(turb, u_tau,           &
+                                       Grid % wall_dist(c1),  &
+                                       kin_vis, 0.0)
             if(turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
           end if
         end if
