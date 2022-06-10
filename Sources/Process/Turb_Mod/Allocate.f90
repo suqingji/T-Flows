@@ -33,8 +33,8 @@
   allocate(turb % y_plus  (-nb:nc));  turb % y_plus   = 0.
 
   ! Hydraulic roughness given by formula
+  allocate(turb % z_o_f  (-nb:nc)); turb % z_o_f   = -1.0
   if(turb % rough_walls) then
-    allocate(turb % z_o_f  (-nb:nc)); turb % z_o_f   = -1.0
     allocate(turb % id_zone(-nb:nc)); turb % id_zone =  0.0
   end if
 
