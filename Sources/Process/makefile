@@ -249,12 +249,9 @@ SRC_FUN = Balance_Volume.f90                    \
           Update_Boundary_Values.f90
 
 # Non-member functions still residing in Turb_Mod
-SRC_FUN += Tau_Wall_Low_Re.f90         \
-           Tau_Wall_Rough_Walls.f90    \
-           Y_Plus_Low_Re.f90           \
-           Y_Plus_Rough_Walls.f90      \
+SRC_FUN += Tau_Wall_Log_Law.f90        \
+           Y_Plus.f90                  \
            U_Plus_Log_Law.f90          \
-           U_Plus_Rough_Walls.f90      \
            Time_And_Length_Scale.f90   \
            Find_Nearest_Wall_Cell.f90  \
            Roughness_Coefficient.f90
