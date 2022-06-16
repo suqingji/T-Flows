@@ -24,6 +24,9 @@
   c_f1    =  1.4
   c_f2    =  0.3
 
+  ! Roughness coefficient
+  turb % z_o = 0.0 
+
   ! Constants for buoyancy wall function
   c_mu_theta   =  0.1225
   c_mu_theta5  =  0.35

@@ -18,10 +18,8 @@
   type(Solver_Type), target :: Sol
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
-  real :: Tau_Wall_Low_Re
-  real :: Tau_Wall_Rough_Walls
-  real :: Y_Plus_Low_Re
-  real :: Y_Plus_Rough_Walls
+  real :: Tau_Wall_Log_Law
+  real :: Y_Plus
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -137,53 +135,41 @@
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or. &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
+        ! Set up roughness coefficient 
+        z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+        if(turb % rough_walls) then
+          z_o = max(Grid % wall_dist(c1)   &
+              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
+        end if
+
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
+     
+        turb % y_plus(c1) = Y_Plus(turb,                 &
+                                   u_tau,                &
+                                   Grid % wall_dist(c1), &
+                                   kin_vis,              &
+                                   z_o)
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau,                 &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
-
-        turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                              Flow % density(c1), &
-                                              u_tau,              &
-                                              u_tan,              &
-                                              turb % y_plus(c1))
+        turb % tau_wall(c1) = Tau_Wall_Log_Law(turb,                &
+                                              Flow % density(c1),   &
+                                              u_tau,                &
+                                              u_tan,                &
+                                              Grid % wall_dist(c1), &
+                                              turb % y_plus(c1),    &
+                                              z_o)
 
         ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
         p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                  / (Grid % wall_dist(c1) * kappa)
+                  / ((Grid % wall_dist(c1) + z_o) * kappa)
 
         p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
 
         turb % p_kin(c1) = exp(-1.0 * ebf) * p_kin_int   &
                          + exp(-1.0 / ebf) * p_kin_wf
-
-        if(turb % rough_walls) then
-          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-          z_o = max(Grid % wall_dist(c1)   &
-              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
-
-          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                                 u_tau,                 &
-                                                 Grid % wall_dist(c1),  &
-                                                 kin_vis)
-
-          turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
-                                                     Flow % density(c1),    &
-                                                     u_tau,                 &
-                                                     u_tan,                 &
-                                                     Grid % wall_dist(c1),  &
-                                                     z_o)
-
-          turb % p_kin(c1) = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1)) &
-                           / (kappa * (Grid % wall_dist(c1) + z_o))
-
-        end if ! rough_walls
 
         b(c1) = b(c1) + (turb % p_kin(c1)  &
               - turb % vis_t(c1) * Flow % shear(c1)**2) * Grid % vol(c1)

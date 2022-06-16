@@ -41,8 +41,8 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Turb_Mod/Ebf_Momentum.f90
 #-- ./Turb_Mod/Prandtl_Number.f90
 #-- ./Turb_Mod/Allocate.f90
-#-- ./Turb_Mod/Y_Plus_Low_Re.f90
-$(DIR_OBJECT)/Y_Plus_Low_Re.o:\
+#-- ./Turb_Mod/Y_Plus.f90
+$(DIR_OBJECT)/Y_Plus.o:\
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
@@ -55,10 +55,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 
 #-- ./Turb_Mod/Calculate_Mean.f90
 #-- ./Turb_Mod/Face_Stress.f90
-#-- ./Turb_Mod/Y_Plus_Rough_Walls.f90
-$(DIR_OBJECT)/Y_Plus_Rough_Walls.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 
 
 #-- ./Turb_Mod/Tau_Wall_Low_Re.f90
 $(DIR_OBJECT)/Tau_Wall_Low_Re.o:\
@@ -72,11 +68,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Turb_Mod/Compute_Variable.f90
-#-- ./Turb_Mod/U_Plus_Rough_Walls.f90
-$(DIR_OBJECT)/U_Plus_Rough_Walls.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turb_Mod/Alias_K_Eps_Zeta_F.f90
 #-- ./Turb_Mod/Compute_F22.f90
@@ -97,8 +88,8 @@ Turb_Mod/*.f90
 
 #-- ./Turb_Mod/Face_Cond_And_Stress.f90
 #-- ./Turb_Mod/Src_Eps_K_Eps_Zeta_F.f90
-#-- ./Turb_Mod/Tau_Wall_Rough_Walls.f90
-$(DIR_OBJECT)/Tau_Wall_Rough_Walls.o:\
+#-- ./Turb_Mod/Tau_Wall_Log_Law.f90
+$(DIR_OBJECT)/Tau_Wall_Log_Law.o:\
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 
 

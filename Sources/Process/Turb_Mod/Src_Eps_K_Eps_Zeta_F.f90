@@ -10,10 +10,8 @@
   type(Solver_Type), target :: Sol
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
-  real :: Tau_Wall_Low_Re
-  real :: Y_Plus_Low_Re
-  real :: Y_Plus_Rough_Walls
-  real :: Tau_Wall_Rough_Walls
+  real :: Tau_Wall_Log_Law
+  real :: Y_Plus
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -26,7 +24,7 @@
   real                       :: e_sor, c_11e, ebf
   real                       :: eps_wf, eps_int
   real                       :: fa, u_tau_new, kin_vis, p_kin_int, p_kin_wf
-  real                       :: z_o
+  real                       :: z_o, dia_coef_tmp
 !==============================================================================!
 !   In dissipation of turbulent kinetic energy equation exist two              !
 !   source terms which have form:                                              !
@@ -93,38 +91,50 @@
       if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
           Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
+        ! Set up roughness coefficient
+        z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+        if(turb % rough_walls) then
+          z_o = max(Grid % wall_dist(c1)  &
+              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
+        end if 
+ 
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau,                 &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
+        turb % y_plus(c1) = Y_Plus(turb,                  &
+                                   u_tau,                 &
+                                   Grid % wall_dist(c1),  &
+                                   kin_vis,               &
+                                   z_o)
 
-        turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                              Flow % density(c1), &
-                                              u_tau,              &
-                                              u_tan,              &
-                                              turb % y_plus(c1))
+        turb % tau_wall(c1) = Tau_Wall_Log_Law(turb,                 &
+                                               Flow % density(c1),   &
+                                               u_tau,                &
+                                               u_tan,                &
+                                               Grid % wall_dist(c1), &
+                                               turb % y_plus(c1),    &
+                                               z_o)
 
         u_tau_new = sqrt(turb % tau_wall(c1) / Flow % density(c1))
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau_new,             &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
+        turb % y_plus(c1) = Y_Plus(turb,                  &
+                                   u_tau_new,             &
+                                   Grid % wall_dist(c1),  &
+                                   kin_vis,               &
+                                   z_o)
 
         eps_int = 2.0* kin_vis * kin % n(c1)  &
                 / Grid % wall_dist(c1)**2
-        eps_wf  = c_mu75 * kin % n(c1)**1.5            &
-                / (Grid % wall_dist(c1) * kappa)
+
+        eps_wf  = c_mu75 * kin % n(c1)**1.5   &
+                / ((Grid % wall_dist(c1) + z_o) * kappa)
 
         ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
         p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                / (Grid % wall_dist(c1) * kappa)
+                / ((Grid % wall_dist(c1) + z_o) * kappa)
 
         p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
 
@@ -135,50 +145,20 @@
 
         eps % n(c1) = (1.0 - fa)**0.5 * eps_int + fa**0.5 * eps_wf
 
-        if(turb % rough_walls) then
-          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-          z_o = max(Grid % wall_dist(c1)  &
-              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
- 
-          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                                 u_tau,                 &
-                                                 Grid % wall_dist(c1),  &
-                                                 kin_vis)
-
-          turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
-                                                     Flow % density(c1),    &
-                                                     u_tau,                 &
-                                                     u_tan,                 &
-                                                     Grid % wall_dist(c1),  &
-                                                     z_o)
-
-          p_kin_wf = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                   / (kappa * (Grid % wall_dist(c1) + z_o))
-
-          eps_wf = c_mu75 * kin % n(c1)**1.5  &
-                 / ((Grid % wall_dist(c1) + z_o) * kappa)
-
-          ebf = Turb_Mod_Ebf_Momentum(turb, c1)
-
-          p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
-
-          turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf)  &
-                           + p_kin_wf * exp(-1.0 / ebf)
-
-          fa = min( p_kin_wf * exp(-1.0 / ebf) / (turb % p_kin(c1) + TINY), 1.0)
-
-          eps % n(c1) = (1.0 - fa)**0.5 * eps_int  &
-                      + fa**0.5 * eps_wf
-        end if  ! rough_walls
-
         if(turb % y_plus(c1) > 3) then
+     
+          dia_coef_tmp = A % val(A % dia(c1))
+
           ! Adjusting coefficient to fix eps value in near wall calls
           do j = A % row(c1), A % row(c1 + 1) - 1
             A % val(j) = 0.0
           end do
-          b(c1) = eps % n(c1)
-          A % val(A % dia(c1)) = 1.0
+
+          b(c1) = eps % n(c1) * dia_coef_tmp
+          A % val(A % dia(c1)) = dia_coef_tmp
+
         else
+
           eps % n(c2) = 2.0* kin_vis * kin % n(c1)  &
                       / Grid % wall_dist(c1)**2
         end if  ! y_plus(c1) < 3

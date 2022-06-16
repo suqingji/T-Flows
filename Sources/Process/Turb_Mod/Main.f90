@@ -12,11 +12,21 @@
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
+  type(Var_Type),   pointer :: phi
+  integer                   :: sc
 !==============================================================================!
 
   ! Take aliases
   Flow => turb % pnt_flow
   Grid => Flow % pnt_grid
+
+  do sc = 1, Flow % n_scalars
+    phi => Flow % scalar(sc)
+    if(Flow % n_scalars > 0) then
+      call Turb_Mod_Calculate_Stress   (turb)
+      call Turb_Mod_Calculate_Scalar_Flux(turb, sc)
+    end if
+  end do
 
   !---------------------------------------------------!
   !   Start branching for various turbulence models   !
